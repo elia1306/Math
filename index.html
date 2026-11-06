@@ -137,69 +137,36 @@ function portrait(s){
  return '<svg viewBox="0 0 120 132" role="img" aria-label="'+s.name+'漫畫角色立繪"><path d="M10 128Q12 85 60 82Q108 85 110 128Z" fill="'+col+'" stroke="#17243a" stroke-width="4"/><path d="M39 83L60 108 81 83" fill="#fff" stroke="#17243a" stroke-width="3"/><path d="M25 51Q20 8 60 9Q100 8 95 51L89 70Q82 91 60 91Q38 91 31 70Z" fill="#f4c49c" stroke="#17243a" stroke-width="4"/><path d="M24 49Q16 12 58 7Q94 5 98 39L88 34 78 22Q57 39 27 35Z" fill="'+col+'" stroke="#17243a" stroke-width="4"/><circle cx="46" cy="55" r="4" fill="#17243a"/><circle cx="74" cy="55" r="4" fill="#17243a"/><path d="M51 70Q60 77 69 70" fill="none" stroke="#9b4b4b" stroke-width="3"/><circle cx="98" cy="91" r="13" fill="#ffdf59" stroke="#17243a" stroke-width="3"/><text x="98" y="97" text-anchor="middle" font-size="16">'+s.emoji+'</text></svg>';
 }
 function suspectBoard(){return '<div class="suspect-grid">'+suspects.map(s=>'<div class="suspect-card">'+portrait(s)+'<b>'+s.name+'</b><small>'+s.role+'</small><p>'+s.desc+'</p></div>').join("")+'</div>';}
-let activeQuestions=[
-];
-const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
-const gcd=(a,b)=>b?gcd(b,a%b):a;
-const lcm=(a,b)=>a/gcd(a,b)*b;
-function makeQ(prompt,answer,distractors,why){
- const opts=[String(answer),...distractors.map(String)];
- for(let i=opts.length-1;i>0;i--){const j=rand(0,i);[opts[i],opts[j]]=[opts[j],opts[i]]}
- return [prompt,opts,opts.indexOf(String(answer)),why];
-}
-function makeQuestions(level){
- const pool=[];
- if(level===0){
-  for(let i=0;i<24;i++){const n=rand(12,48),k=rand(2,8);
-   if(i%3===0){const fs=Array.from({length:n},(_,j)=>j+1).filter(x=>n%x===0).join("、");pool.push(makeQ(n+" 的所有正因數是哪一組？",fs,[fs+"、"+(n+1),"1、"+n,"2、3、5"],"能整除 "+n+" 且沒有餘數的數，才是它的因數。"))}
-   else if(i%3===1){const v=n*k;pool.push(makeQ(n+" 的第 "+k+" 個正倍數是多少？",v,[v+n,v-n,n+k],n+" × "+k+" ＝ "+v+"。"))}
-   else{const a=rand(2,9),b=rand(2,9),x=a*n,y=b*n,g=gcd(x,y);pool.push(makeQ(x+" 和 "+y+" 的最大公因數是多少？",g,[g+1,g*2,Math.min(x,y)],"共同因數中最大的數是 "+g+"。"))}
-  }
- }else if(level===1){
-  for(let i=0;i<24;i++){const a=rand(2,12),b=rand(2,12),m=rand(2,5),x=a*m,y=b*m,g=gcd(x,y);pool.push(makeQ(x+" 和 "+y+" 的最大公因數是多少？",g,[g*2,g+2,Math.max(x,y)],"兩數共同因數中最大的數是 "+g+"。"))}
- }else if(level===2){
-  for(let i=0;i<24;i++){const a=rand(2,12),b=rand(2,12),m=rand(2,5),x=a*m,y=b*m,v=lcm(x,y);pool.push(makeQ(x+" 和 "+y+" 的最小公倍數是多少？",v,[v+m,v*2,Math.max(x,y)],"最小共同倍數是 "+v+"。"))}
- }else if(level===3){
-  for(let i=0;i<24;i++){const a=rand(3,12),b=rand(3,12);
-   if(i%3===0){const x=a*2,y=b*2,v=gcd(x,y);pool.push(makeQ(x+" 顆紅球和 "+y+" 顆藍球分成內容相同且最多的幾組？",v,[v+2,lcm(x,y),a+b],"平均分成最多組，求最大公因數。"))}
-   else if(i%3===1){const v=lcm(a,b);pool.push(makeQ("甲每 "+a+" 分鐘響一次，乙每 "+b+" 分鐘響一次，現在同時響，幾分鐘後再次同時響？",v,[gcd(a,b),v+a,v+b],"週期重合，求最小公倍數。"))}
-   else{const x=a*6,y=b*6,v=gcd(x,y);pool.push(makeQ("長 "+x+" 公分和 "+y+" 公分的緞帶，剪成相同且最長的小段，每段幾公分？",v,[v*2,Math.abs(x-y),lcm(x,y)],"等長切割且要最長，求最大公因數。"))}
-  }
- }else{
-  for(let i=0;i<24;i++){const a=rand(3,12),b=rand(3,12),m=rand(2,4),x=a*m,y=b*m;
-   if(i%2===0){const v=gcd(x,y);pool.push(makeQ(x+" 位同學和 "+y+" 張卡片平均分成最多份，最多幾份？",v,[lcm(x,y),v+m,Math.max(x,y)],"平均分配成最多份，求最大公因數。"))}
-   else{const v=lcm(a,b);pool.push(makeQ("兩個提示燈分別每 "+a+" 秒和每 "+b+" 秒閃一次，同時閃後幾秒再次同時？",v,[gcd(a,b),v+a,v+b],"週期同時發生，求最小公倍數。"))}
-  }
- }
- for(let i=pool.length-1;i>0;i--){const j=rand(0,i);[pool[i],pool[j]]=[pool[j],pool[i]]}
- return pool.slice(0,5);
-}
-const evidenceClues=[
- "證物 01：獎盃底座旁的星星貼紙，與校刊封面裝飾相同。",
- "證物 02：收納箱裡的金色緞帶，與校刊編輯桌上的佈置材料吻合。",
- "證物 03：值日紀錄顯示，下午 4:10 走廊燈號與廣播測試同時啟動。",
- "證物 04：目擊者看見有人拿著長筒海報筒，往活動中心方向走。",
- "證物 05：海報筒內找到字條：「獎盃已移到驚喜展台，校慶時一起揭幕！」"
-];
-const suspects=[
- {name:"林小晴｜圖書股長",role:"負責圖書室與借還紀錄",emoji:"📚",desc:"當天下午在圖書室整理新書。"},
- {name:"陳阿哲｜自然小老師",role:"負責器材與實驗室",emoji:"🧪",desc:"當天下午在自然教室準備展示。"},
- {name:"周小宇｜校刊編輯",role:"負責校刊封面與驚喜展台",emoji:"📰",desc:"當天下午曾拿著海報筒前往活動中心。"}
-];
-function portrait(s){
- const col=s.emoji==="📚"?"#315b7d":s.emoji==="🧪"?"#287c70":"#a63d55";
- return '<svg viewBox="0 0 120 132" role="img" aria-label="'+s.name+'漫畫角色立繪"><path d="M10 128Q12 85 60 82Q108 85 110 128Z" fill="'+col+'" stroke="#17243a" stroke-width="4"/><path d="M39 83L60 108 81 83" fill="#fff" stroke="#17243a" stroke-width="3"/><path d="M25 51Q20 8 60 9Q100 8 95 51L89 70Q82 91 60 91Q38 91 31 70Z" fill="#f4c49c" stroke="#17243a" stroke-width="4"/><path d="M24 49Q16 12 58 7Q94 5 98 39L88 34 78 22Q57 39 27 35Z" fill="'+col+'" stroke="#17243a" stroke-width="4"/><circle cx="46" cy="55" r="4" fill="#17243a"/><circle cx="74" cy="55" r="4" fill="#17243a"/><path d="M51 70Q60 77 69 70" fill="none" stroke="#9b4b4b" stroke-width="3"/><circle cx="98" cy="91" r="13" fill="#ffdf59" stroke="#17243a" stroke-width="3"/><text x="98" y="97" text-anchor="middle" font-size="16">'+s.emoji+'</text></svg>';
-}
-function suspectBoard(){return '<div class="suspect-grid">'+suspects.map(s=>'<div class="suspect-card">'+portrait(s)+'<b>'+s.name+'</b><small>'+s.role+'</small><p>'+s.desc+'</p></div>').join("")+'</div>';}
 let activeQuestions=[];
+
 let state=JSON.parse(localStorage.getItem("mathQuest")||'{"done":[],"correct":0,"wrong":{},"stars":0,"badges":[],"rewarded":[]}');state.stars=state.stars||0;state.badges=state.badges||[];state.rewarded=state.rewarded||[];state.evidence=state.evidence||[];state.caseSolved=state.caseSolved||false;let current=0;
 const nav=document.getElementById("nav"),content=document.getElementById("content");
 function save(){localStorage.setItem("mathQuest",JSON.stringify(state));stats()}
 function stats(){document.getElementById("suspects").innerHTML=suspectBoard();document.getElementById("evidenceList").innerHTML=state.evidence.length?state.evidence.map(e=>"<p>🔎 "+e+"</p>").join(""):"尚未取得證物";document.getElementById("progressText").textContent=state.done.length+" / 5 關";document.getElementById("progressBar").style.width=state.done.length*20+"%";document.getElementById("correctCount").textContent=state.correct;document.getElementById("wrongCount").textContent=Object.keys(state.wrong).length;document.getElementById("starCount").textContent=state.stars+" ⭐";document.getElementById("badgeCount").textContent=state.badges.length+" 🏅";document.getElementById("badges").innerHTML=state.badges.length?"🏅 我的徽章： "+state.badges.map(x=>"<span class='badge'>"+x+"</span>").join(""):"🎁 完成關卡收集徽章！"}
 function menu(){nav.innerHTML=lessons.map((l,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-i='"+i+"' "+(i>0&&!state.done.includes(i-1)?"disabled":"")+">"+(state.done.includes(i)?"🏆 ":"🗝️ ")+l.title+"<small>"+l.sub+"</small></button>").join("");nav.querySelectorAll("button").forEach(b=>b.onclick=()=>{if(!b.disabled){current=+b.dataset.i;render()}})}
 function render(){menu();let l=lessons[current];activeQuestions=makeQuestions(current);content.innerHTML="<span class='pill'>🕵️ 案件 "+(current+1)+"｜現場調查中</span><div class='case-stamp'>CASE FILE 0"+(current+1)+"</div><div class='case-story'><p>"+l.story+"</p></div>"+l.body+"<h3>🔎 案件推理測驗</h3><p>每題選一個答案，提交後看解析、領星星！</p><div id='quiz'></div><div class='actions'><button class='primary' id='finish'>提交推理・取得線索</button><button class='secondary' id='next'>下一關 →</button></div><div id='result'></div>";document.getElementById("quiz").innerHTML=activeQuestions.map((q,i)=>"<div class='question'><b>"+(i+1)+". "+q[0]+"</b>"+q[1].map((o,j)=>"<label class='option'><input type='radio' name='q"+i+"' value='"+j+"'> "+String.fromCharCode(65+j)+". "+o+"</label>").join("")+"<div id='f"+i+"'></div></div>").join("");document.getElementById("finish").onclick=grade;document.getElementById("next").onclick=()=>{if(!state.done.includes(current)){document.getElementById("result").innerHTML="<p class='feedback bad'>先完成本關挑戰，才能前往下一關喔！</p>";return}if(current<4){current++;render()}else{summary()}}}
-function grade(){let l=lessons[current],score=0,answered=0;const picks=activeQuestions.map((q,i)=>document.querySelector("input[name=q"+i+"]:checked"));if(picks.some(p=>!p)){activeQuestions.forEach((q,i)=>{if(!picks[i])document.getElementById("f"+i).innerHTML="<div class='feedback bad'>請先回答這一題</div>"});document.getElementById("result").innerHTML="<p class='feedback bad'>還有題目未作答，請完成 5 題再提交。</p>";return}activeQuestions.forEach((q,i)=>{let p=document.querySelector("input[name=q"+i+"]:checked"),f=document.getElementById("f"+i);if(!p)return;answered++;if(+p.value===q[2]){score++;state.correct++;delete state.wrong[current+"-"+i];f.innerHTML="<div class='feedback good'>答對了！"+q[3]+"</div>"}else{state.wrong[current+"-"+i]={question:q[0],correct:q[1][q[2]],why:q[3]};f.innerHTML="<div class='feedback bad'>正確答案："+q[1][q[2]]+"。"+q[3]+"</div>"}});if(answered===activeQuestions.length){const firstClear=!state.rewarded.includes(current);if(!state.done.includes(current))state.done.push(current);if(firstClear){state.rewarded.push(current);state.evidence.push(evidenceClues[current]);}let stars=score===5?3:score>=4?2:1;if(firstClear)state.stars+=stars;let badge=["🌱 因數小新手","🧩 公因數探索家","🚀 倍數小超人","🕵️ 應用解題王","👑 數學闖關冠軍"][current];state.badges.push(badge);document.getElementById("result").innerHTML="<p class='score'>獲得 "+stars+" 顆星星 ⭐</p><p>答對 "+score+"/"+l.qs.length+" 題！"+(score===l.qs.length?"完美通關！":"完成挑戰！")+"</p><p class='callout'>🏅 解鎖徽章："+badge+"</p>"}else{document.getElementById("result").innerHTML="<p class='feedback bad'>請完成所有題目，再提交一次。</p>"}save();menu()}
-function summary(){if(state.done.length<5){document.getElementById("result").innerHTML="<p class='feedback bad'>先完成五份案件，才能公開最後推理！</p>";return}state.caseSolved=true;save();content.innerHTML="<span class='case-stamp'>FINAL DEDUCTION</span><h2>🎬 真相揭曉！獎盃失竊案結案</h2><div class='case-story'><p>真正移動獎盃的人是周小宇，校刊編輯！但他不是要偷走獎盃，而是想把獎盃放到活動中心的驚喜展台，準備在校慶當天揭幕。</p></div><h3>🧾 五件證物如何串起真相？</h3>"+state.evidence.map((e,i)=>"<div class='question'><b>"+e+"</b><p>"+["星星貼紙與校刊封面相同，線索指向校刊編輯。","金色緞帶來自校刊編輯桌上的佈置材料。","時間紀錄與小宇前往活動中心前的準備時段吻合。","目擊者看到海報筒，與小宇製作驚喜展台的工作相符。","字條說明他把獎盃移去展台，真相終於完整。"][i]+"</p></div>").join("")+"<h3>🕵️ 偵探的結案報告</h3><p class='callout'>小晴與阿哲都只是協助校慶準備。小宇想製造驚喜，卻忘了先告訴老師，才讓大家誤以為獎盃失竊。這是一場烏龍事件！</p><p class='score'>⭐ "+state.stars+" 顆星星｜🏅 "+state.badges.length+" 枚徽章</p><button class='primary' id='back'>回到案件地圖</button>";document.getElementById("back").onclick=()=>{current=0;render()}}"<h2>🎉 五關冒險完成！</h2><p class='score'>⭐ "+state.stars+" 顆星星</p><p>🏅 "+state.badges.join("、")+"</p><p>你已成為數學闖關小勇士！答對 "+state.correct+" 題，還有 "+Object.keys(state.wrong).length+" 題可以訂正。</p><button class='primary' id='back'>回到闖關地圖</button>";document.getElementById("back").onclick=()=>{current=0;render()}}
+function grade(){
+ const picks=activeQuestions.map((q,i)=>document.querySelector("input[name=q"+i+"]:checked"));
+ if(picks.some(p=>!p)){activeQuestions.forEach((q,i)=>{if(!picks[i])document.getElementById("f"+i).innerHTML="<div class='feedback bad'>請先回答這一題</div>"});document.getElementById("result").innerHTML="<p class='feedback bad'>請完成全部 5 題再提交。</p>";return}
+ let score=0;
+ activeQuestions.forEach((q,i)=>{const p=picks[i],f=document.getElementById("f"+i);if(+p.value===q[2]){score++;state.correct++;delete state.wrong[current+"-"+i];f.innerHTML="<div class='feedback good'>推理正確！"+q[3]+"</div>"}else{state.wrong[current+"-"+i]={question:q[0],correct:q[1][q[2]],why:q[3]};f.innerHTML="<div class='feedback bad'>正確答案："+q[1][q[2]]+"。"+q[3]+"</div>"}});
+ const firstClear=!state.rewarded.includes(current);
+ if(!state.done.includes(current))state.done.push(current);
+ if(firstClear){state.rewarded.push(current);state.evidence.push(evidenceClues[current]);}
+ const stars=score===5?3:score>=4?2:1;
+ if(firstClear)state.stars+=stars;
+ const badge=["🌱 因數小新手","🧩 公因數探索家","🚀 倍數小超人","🕵️ 應用解題王","👑 數學闖關冠軍"][current];
+ if(firstClear&&!state.badges.includes(badge))state.badges.push(badge);
+ document.getElementById("result").innerHTML="<p class='score'>"+(firstClear?"獲得 "+stars+" 顆星星 ⭐":"再次挑戰完成！")+"</p><p>答對 "+score+"/5 題！"+(score===5?"完美推理！":"完成挑戰！")+"</p>"+(firstClear?"<p class='callout'>🏅 解鎖徽章："+badge+"<br>🧾 新證物："+evidenceClues[current]+"</p>":"<p class='callout'>這份證物已經收集過囉！本次新題目已完成。</p>")+(current===4?"<button class='primary' id='reveal'>🔦 公開最後推理！</button>":"");
+ const rb=document.getElementById("reveal");if(rb)rb.onclick=summary;
+ save();menu();
+}
+function summary(){
+ if(state.done.length<5){document.getElementById("result").innerHTML="<p class='feedback bad'>先完成五份案件，才能公開最後推理！</p>";return}
+ state.caseSolved=true;save();
+ content.innerHTML="<span class='case-stamp'>FINAL DEDUCTION</span><h2>🎬 真相揭曉！獎盃失竊案結案</h2><div class='case-story'><p>真正移動獎盃的人是周小宇，校刊編輯！但他不是要偷走獎盃，而是想把獎盃放到活動中心的驚喜展台，準備在校慶當天揭幕。</p></div><h3>🧾 五件證物如何串起真相？</h3>"+state.evidence.map((e,i)=>"<div class='question'><b>"+e+"</b><p>"+["星星貼紙與校刊封面相同，線索指向校刊編輯。","金色緞帶來自校刊編輯桌上的佈置材料。","時間紀錄與小宇前往活動中心前的準備時段吻合。","目擊者看到海報筒，與小宇製作驚喜展台的工作相符。","字條說明他把獎盃移去展台，真相終於完整。"][i]+"</p></div>").join("")+"<h3>🕵️ 偵探的結案報告</h3><p class='callout'>小晴與阿哲都只是協助校慶準備。小宇想製造驚喜，卻忘了先告訴老師，才讓大家誤以為獎盃失竊。這是一場烏龍事件！</p><p class='score'>⭐ "+state.stars+" 顆星星｜🏅 "+state.badges.length+" 枚徽章</p><button class='primary' id='back'>回到案件地圖</button>";
+ document.getElementById("back").onclick=()=>{current=0;render()};
+}
 document.getElementById("reviewWrong").onclick=()=>{let a=Object.values(state.wrong);content.innerHTML="<h2>📒 我的錯題本</h2>"+(a.length?a.map((x,i)=>"<div class='question'><b>"+(i+1)+". "+x.question+"</b><p class='good'>正確答案："+x.correct+"</p><p>"+x.why+"</p></div>").join(""):"<p class='callout'>目前沒有待訂正錯題，真棒！</p>")+"<button class='secondary' id='return'>返回課程</button>";document.getElementById("return").onclick=render};
 document.getElementById("reset").onclick=()=>{if(confirm("確定清除所有星星、徽章與紀錄？")){state={done:[],correct:0,wrong:{},stars:0,badges:[],rewarded:[],evidence:[],caseSolved:false};save();current=0;render()}};stats();render();
 </script></body></html>
