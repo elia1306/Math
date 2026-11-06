@@ -74,6 +74,19 @@ button:active{transform:translate(2px,2px);box-shadow:none}
 .suspect-card b,.suspect-card small{display:block}.suspect-card p{margin:4px 0}
 @media(max-width:460px){.suspect-grid{grid-template-columns:1fr}.suspect-card{display:grid;grid-template-columns:78px 1fr;column-gap:8px;text-align:left;align-items:center}.suspect-card svg{grid-row:span 3;width:78px}}
 
+
+/* Layout refinement: wider case sidebar and readable suspect names */
+.layout{grid-template-columns:340px minmax(0,1fr)}
+.suspect-grid{grid-template-columns:1fr;gap:7px}
+.suspect-card{display:grid;grid-template-columns:68px minmax(0,1fr);column-gap:10px;text-align:left;align-items:center;padding:8px}
+.suspect-card svg{grid-row:1 / span 3;width:68px;max-width:68px;margin:auto}
+.suspect-card b{font-size:13px;white-space:nowrap;line-height:1.4}
+.suspect-card small,.suspect-card p{min-width:0;overflow-wrap:anywhere}
+.case-story p{line-height:1.75;overflow-wrap:anywhere}
+@media(max-width:720px){
+ .layout{grid-template-columns:minmax(0,1fr)}
+ .suspect-card{grid-template-columns:68px minmax(0,1fr)}
+}
 </style></head><body>
 <header><div class="wrap"><div class="top"><strong>🕵️‍♂️🔎 數學偵探事務所</strong><span class="tag">國小六年級・數學冒險</span></div><h1>🔎 校慶失竊案：數字的真相</h1><p>🗝️ 一起追查失蹤的智慧之星獎盃！用數學破解謎團！</p><div class="progress"><div class="top"><b>🏁 闖關進度</b><span id="progressText">0 / 5 關</span></div><div class="bar"><span id="progressBar"></span></div></div></div></header>
 <main class="wrap layout"><aside class="panel"><h3>🗂️ 案件檔案</h3><div class="stats"><div class="stat"><b id="starCount">0 ⭐</b>星星</div><div class="stat"><b id="badgeCount">0 🏅</b>徽章</div></div><div id="badges" class="callout">🔍 破解案件，收集偵探徽章！</div><h3>🧍 嫌疑人名單</h3><div id="suspects"></div><h3>🧾 已收集證物</h3><div id="evidenceList" class="callout">尚未取得證物</div><nav id="nav"></nav><hr><h3>📁 偵查紀錄</h3><div class="stats"><div class="stat"><b id="correctCount">0</b>答對題數</div><div class="stat"><b id="wrongCount">0</b>待訂正</div></div><div class="actions"><button class="secondary" id="reviewWrong">查看錯題</button><button class="secondary" id="reset">重設紀錄</button></div></aside><section class="content" id="content" aria-live="polite"></section></main><p class="footer">學習紀錄保存在目前裝置的瀏覽器中；清除瀏覽資料可能會讓紀錄消失。</p>
