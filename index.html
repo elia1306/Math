@@ -78,6 +78,59 @@ const lessons=[
 {title:"第 4 關｜生活應用島",story:"目前有三位可能的目擊者：圖書股長、自然小老師和校刊編輯。線索藏在分組與週期問題裡。請判斷每個情境該用最大公因數還是最小公倍數，縮小調查範圍！",sub:"判斷使用哪一種方法",body:"<h2>🕵️ 看懂題目再出招</h2><div class='callout'><b>最大公因數：</b>分組、平分、剪成相同的最長長度。<br><b>最小公倍數：</b>週期、同時、再次相遇或重合。</div><h3>解題三步驟</h3><ol><li>圈出題目問什麼。</li><li>判斷是「分組」還是「週期重合」。</li><li>列式計算，寫上單位與答句。</li></ol>",qs:[["30 顆蘋果和 45 顆橘子分成內容相同且不剩的最多禮盒數，應求？",["最大公因數","最小公倍數"],0,"平均分組，求最大公因數。"],["甲車每 8 分鐘、乙車每 12 分鐘發車，同時發車後多久再次同時？",["最大公因數","最小公倍數"],1,"週期重合，求最小公倍數 24 分鐘。"],["48 公分和 60 公分緞帶剪成相同且最長的小段，每段幾公分？",["6 公分","12 公分","24 公分"],1,"等長切割且要最長，求最大公因數 12 公分。"]]},
 {title:"第 5 關｜終極挑戰",story:"最後一份證物送到了！你已經掌握所有線索，但要確認獎盃的位置，必須解開五道混合謎題。仔細閱讀、選對方法，揭開校慶失竊案的真相！",sub:"混合題型總複習",body:"<h2>👑 終極挑戰！</h2><p>這一關不提示使用哪一種方法。先讀懂題目，再自己決定解法！</p><div class='callout'>考試檢查：我能分辨因數與倍數、使用短除法、判斷最大公因數或最小公倍數，並寫上單位。</div>",qs:[["36 和 48 的最大公因數是多少？",["6","12","18"],1,"最大公因數是 12。"],["10 和 15 的最小公倍數是多少？",["30","45","150"],0,"最小公倍數是 30。"],["紅燈每 6 秒亮一次，綠燈每 9 秒亮一次，同時亮後幾秒再次同時亮？",["3 秒","18 秒","54 秒"],1,"週期重合，求最小公倍數 18 秒。"],["40 顆糖和 56 顆餅乾平均分成最多份，最多幾份？",["4 份","8 份","16 份"],1,"平均分成最多份，求最大公因數 8。"],["16 和 24 的公因數中，最大的是多少？",["4","8","12"],1,"最大公因數是 8。"]]}
 ];
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const lcm=(a,b)=>a/gcd(a,b)*b;
+function makeQ(prompt,answer,distractors,why){
+ const opts=[String(answer),...distractors.map(String)];
+ for(let i=opts.length-1;i>0;i--){const j=rand(0,i);[opts[i],opts[j]]=[opts[j],opts[i]]}
+ return [prompt,opts,opts.indexOf(String(answer)),why];
+}
+function makeQuestions(level){
+ const pool=[];
+ if(level===0){
+  for(let i=0;i<24;i++){const n=rand(12,48),k=rand(2,8);
+   if(i%3===0){const fs=Array.from({length:n},(_,j)=>j+1).filter(x=>n%x===0).join("、");pool.push(makeQ(n+" 的所有正因數是哪一組？",fs,[fs+"、"+(n+1),"1、"+n,"2、3、5"],"能整除 "+n+" 且沒有餘數的數，才是它的因數。"))}
+   else if(i%3===1){const v=n*k;pool.push(makeQ(n+" 的第 "+k+" 個正倍數是多少？",v,[v+n,v-n,n+k],n+" × "+k+" ＝ "+v+"。"))}
+   else{const a=rand(2,9),b=rand(2,9),x=a*n,y=b*n,g=gcd(x,y);pool.push(makeQ(x+" 和 "+y+" 的最大公因數是多少？",g,[g+1,g*2,Math.min(x,y)],"共同因數中最大的數是 "+g+"。"))}
+  }
+ }else if(level===1){
+  for(let i=0;i<24;i++){const a=rand(2,12),b=rand(2,12),m=rand(2,5),x=a*m,y=b*m,g=gcd(x,y);pool.push(makeQ(x+" 和 "+y+" 的最大公因數是多少？",g,[g*2,g+2,Math.max(x,y)],"兩數共同因數中最大的數是 "+g+"。"))}
+ }else if(level===2){
+  for(let i=0;i<24;i++){const a=rand(2,12),b=rand(2,12),m=rand(2,5),x=a*m,y=b*m,v=lcm(x,y);pool.push(makeQ(x+" 和 "+y+" 的最小公倍數是多少？",v,[v+m,v*2,Math.max(x,y)],"最小共同倍數是 "+v+"。"))}
+ }else if(level===3){
+  for(let i=0;i<24;i++){const a=rand(3,12),b=rand(3,12);
+   if(i%3===0){const x=a*2,y=b*2,v=gcd(x,y);pool.push(makeQ(x+" 顆紅球和 "+y+" 顆藍球分成內容相同且最多的幾組？",v,[v+2,lcm(x,y),a+b],"平均分成最多組，求最大公因數。"))}
+   else if(i%3===1){const v=lcm(a,b);pool.push(makeQ("甲每 "+a+" 分鐘響一次，乙每 "+b+" 分鐘響一次，現在同時響，幾分鐘後再次同時響？",v,[gcd(a,b),v+a,v+b],"週期重合，求最小公倍數。"))}
+   else{const x=a*6,y=b*6,v=gcd(x,y);pool.push(makeQ("長 "+x+" 公分和 "+y+" 公分的緞帶，剪成相同且最長的小段，每段幾公分？",v,[v*2,Math.abs(x-y),lcm(x,y)],"等長切割且要最長，求最大公因數。"))}
+  }
+ }else{
+  for(let i=0;i<24;i++){const a=rand(3,12),b=rand(3,12),m=rand(2,4),x=a*m,y=b*m;
+   if(i%2===0){const v=gcd(x,y);pool.push(makeQ(x+" 位同學和 "+y+" 張卡片平均分成最多份，最多幾份？",v,[lcm(x,y),v+m,Math.max(x,y)],"平均分配成最多份，求最大公因數。"))}
+   else{const v=lcm(a,b);pool.push(makeQ("兩個提示燈分別每 "+a+" 秒和每 "+b+" 秒閃一次，同時閃後幾秒再次同時？",v,[gcd(a,b),v+a,v+b],"週期同時發生，求最小公倍數。"))}
+  }
+ }
+ for(let i=pool.length-1;i>0;i--){const j=rand(0,i);[pool[i],pool[j]]=[pool[j],pool[i]]}
+ return pool.slice(0,5);
+}
+const evidenceClues=[
+ "證物 01：獎盃底座旁的星星貼紙，與校刊封面裝飾相同。",
+ "證物 02：收納箱裡的金色緞帶，與校刊編輯桌上的佈置材料吻合。",
+ "證物 03：值日紀錄顯示，下午 4:10 走廊燈號與廣播測試同時啟動。",
+ "證物 04：目擊者看見有人拿著長筒海報筒，往活動中心方向走。",
+ "證物 05：海報筒內找到字條：「獎盃已移到驚喜展台，校慶時一起揭幕！」"
+];
+const suspects=[
+ {name:"林小晴｜圖書股長",role:"負責圖書室與借還紀錄",emoji:"📚",desc:"當天下午在圖書室整理新書。"},
+ {name:"陳阿哲｜自然小老師",role:"負責器材與實驗室",emoji:"🧪",desc:"當天下午在自然教室準備展示。"},
+ {name:"周小宇｜校刊編輯",role:"負責校刊封面與驚喜展台",emoji:"📰",desc:"當天下午曾拿著海報筒前往活動中心。"}
+];
+function portrait(s){
+ const col=s.emoji==="📚"?"#315b7d":s.emoji==="🧪"?"#287c70":"#a63d55";
+ return '<svg viewBox="0 0 120 132" role="img" aria-label="'+s.name+'漫畫角色立繪"><path d="M10 128Q12 85 60 82Q108 85 110 128Z" fill="'+col+'" stroke="#17243a" stroke-width="4"/><path d="M39 83L60 108 81 83" fill="#fff" stroke="#17243a" stroke-width="3"/><path d="M25 51Q20 8 60 9Q100 8 95 51L89 70Q82 91 60 91Q38 91 31 70Z" fill="#f4c49c" stroke="#17243a" stroke-width="4"/><path d="M24 49Q16 12 58 7Q94 5 98 39L88 34 78 22Q57 39 27 35Z" fill="'+col+'" stroke="#17243a" stroke-width="4"/><circle cx="46" cy="55" r="4" fill="#17243a"/><circle cx="74" cy="55" r="4" fill="#17243a"/><path d="M51 70Q60 77 69 70" fill="none" stroke="#9b4b4b" stroke-width="3"/><circle cx="98" cy="91" r="13" fill="#ffdf59" stroke="#17243a" stroke-width="3"/><text x="98" y="97" text-anchor="middle" font-size="16">'+s.emoji+'</text></svg>';
+}
+function suspectBoard(){return '<div class="suspect-grid">'+suspects.map(s=>'<div class="suspect-card">'+portrait(s)+'<b>'+s.name+'</b><small>'+s.role+'</small><p>'+s.desc+'</p></div>').join("")+'</div>';}
+let activeQuestions=[];
 let state=JSON.parse(localStorage.getItem("mathQuest")||'{"done":[],"correct":0,"wrong":{},"stars":0,"badges":[],"rewarded":[]}');state.stars=state.stars||0;state.badges=state.badges||[];state.rewarded=state.rewarded||[];let current=0;
 const nav=document.getElementById("nav"),content=document.getElementById("content");
 function save(){localStorage.setItem("mathQuest",JSON.stringify(state));stats()}
