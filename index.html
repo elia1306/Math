@@ -130,9 +130,9 @@ const evidenceClues=[
  "證物 05：海報筒內找到字條：「獎盃已移到驚喜展台，校慶時一起揭幕！」"
 ];
 const suspects=[
- {name:"林小晴｜圖書股長",role:"負責圖書室與借還紀錄",emoji:"📚",desc:"當天下午在圖書室整理新書。"},
- {name:"陳阿哲｜自然小老師",role:"負責器材與實驗室",emoji:"🧪",desc:"當天下午在自然教室準備展示。"},
- {name:"周小宇｜校刊編輯",role:"負責校刊封面與驚喜展台",emoji:"📰",desc:"當天下午曾拿著海報筒前往活動中心。"}
+ {name:"傅貝貝｜圖書股長",role:"負責圖書室與借還紀錄",emoji:"📚",desc:"當天下午在圖書室整理新書。"},
+ {name:"傅シロ｜自然小老師",role:"負責器材與實驗室",emoji:"🧪",desc:"當天下午在自然教室準備展示。"},
+ {name:"阿花小天使｜校刊編輯",role:"負責校刊封面與驚喜展台",emoji:"📰",desc:"當天下午曾拿著海報筒前往活動中心。"}
 ];
 function portrait(s){
  const col=s.emoji==="📚"?"#315b7d":s.emoji==="🧪"?"#287c70":"#a63d55";
@@ -168,7 +168,7 @@ function grade(){
 function summary(){
  if(state.done.length<5){document.getElementById("result").innerHTML="<p class='feedback bad'>先完成五份案件，才能公開最後推理！</p>";return}
  state.caseSolved=true;save();
- content.innerHTML="<span class='case-stamp'>FINAL DEDUCTION</span><h2>🎬 真相揭曉！獎盃失竊案結案</h2><div class='case-story'><p>真正移動獎盃的人是周小宇，校刊編輯！但他不是要偷走獎盃，而是想把獎盃放到活動中心的驚喜展台，準備在校慶當天揭幕。</p></div><h3>🧾 五件證物如何串起真相？</h3>"+state.evidence.map((e,i)=>"<div class='question'><b>"+e+"</b><p>"+["星星貼紙與校刊封面相同，線索指向校刊編輯。","金色緞帶來自校刊編輯桌上的佈置材料。","時間紀錄與小宇前往活動中心前的準備時段吻合。","目擊者看到海報筒，與小宇製作驚喜展台的工作相符。","字條說明他把獎盃移去展台，真相終於完整。"][i]+"</p></div>").join("")+"<h3>🕵️ 偵探的結案報告</h3><p class='callout'>小晴與阿哲都只是協助校慶準備。小宇想製造驚喜，卻忘了先告訴老師，才讓大家誤以為獎盃失竊。這是一場烏龍事件！</p><p class='score'>⭐ "+state.stars+" 顆星星｜🏅 "+state.badges.length+" 枚徽章</p><button class='primary' id='back'>回到案件地圖</button>";
+ content.innerHTML="<span class='case-stamp'>FINAL DEDUCTION</span><h2>🎬 真相揭曉！獎盃失竊案結案</h2><div class='case-story'><p>真正移動獎盃的人是阿花小天使，校刊編輯！但他不是要偷走獎盃，而是想把獎盃放到活動中心的驚喜展台，準備在校慶當天揭幕。</p></div><h3>🧾 五件證物如何串起真相？</h3>"+state.evidence.map((e,i)=>"<div class='question'><b>"+e+"</b><p>"+["星星貼紙與校刊封面相同，線索指向校刊編輯。","金色緞帶來自校刊編輯桌上的佈置材料。","時間紀錄與阿花小天使前往活動中心前的準備時段吻合。","目擊者看到海報筒，與阿花小天使製作驚喜展台的工作相符。","字條說明他把獎盃移去展台，真相終於完整。"][i]+"</p></div>").join("")+"<h3>🕵️ 偵探的結案報告</h3><p class='callout'>傅貝貝與傅シロ都只是協助校慶準備。阿花小天使想製造驚喜，卻忘了先告訴老師，才讓大家誤以為獎盃失竊。這是一場烏龍事件！</p><p class='score'>⭐ "+state.stars+" 顆星星｜🏅 "+state.badges.length+" 枚徽章</p><button class='primary' id='back'>回到案件地圖</button>";
  document.getElementById("back").onclick=()=>{current=0;render()};
 }
 document.getElementById("reviewWrong").onclick=()=>{let a=Object.values(state.wrong);content.innerHTML="<h2>📒 我的錯題本</h2>"+(a.length?a.map((x,i)=>"<div class='question'><b>"+(i+1)+". "+x.question+"</b><p class='good'>正確答案："+x.correct+"</p><p>"+x.why+"</p></div>").join(""):"<p class='callout'>目前沒有待訂正錯題，真棒！</p>")+"<button class='secondary' id='return'>返回課程</button>";document.getElementById("return").onclick=render};
