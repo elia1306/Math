@@ -117,30 +117,40 @@ function makeQ(prompt,answer,distractors,why){
  for(let i=opts.length-1;i>0;i--){const j=rand(0,i);[opts[i],opts[j]]=[opts[j],opts[i]]}
  return [prompt,opts,opts.indexOf(correct),why];
 }
+function buildUnitOneBank(){
+ const bank=[[],[],[],[],[]], factors=n=>Array.from({length:n},(_,i)=>i+1).filter(x=>n%x===0);
+ const add=(s,p,a,w,e,d="基礎")=>bank[s].push([p,String(a),w.map(String),e,d]);
+ const ft=n=>factors(n).join("、");
+ [[18,["1、2、3、6、9、18","1、2、3、6、9","1、2、3、6、18"]],[20,["1、2、4、5、10、20","1、2、4、5、20","1、2、4、10、20"]],[28,["1、2、4、7、14、28","1、2、4、7、28","1、2、7、14、28"]],[32,["1、2、4、8、16、32","1、2、4、8、32","1、2、4、16、32"]]].forEach(([n,w])=>add(0,n+" 的所有正因數是哪一組？",ft(n),w,"找出能整除 "+n+" 且沒有餘數的正整數。"));
+ [[7,6],[9,8],[12,5],[15,4]].forEach(([n,k])=>add(0,n+" 的第 "+k+" 個正倍數是多少？",n*k,[n*k+n,n*k-n,n+k],"計算 "+n+" × "+k+"。"));
+ add(0,"下列哪一個數是 24 的因數？","6",["5","7","9"],"24 ÷ 6＝4，沒有餘數。");
+ add(0,"下列哪一個數是 9 的倍數？","45",["34","40","52"],"9 × 5＝45。");
+ [[18,30],[28,42],[24,36],[32,48],[45,60],[54,72],[36,60],[42,70],[48,80],[63,84]].forEach(([a,b],i)=>{const v=gcd(a,b);add(1,a+" 和 "+b+" 的最大公因數是多少？",v,[v+1,v*2,Math.min(a,b)],"共同因數中最大的是 "+v+"。",i<5?"基礎":"進階")});
+ [[6,8],[9,12],[10,15],[12,18],[8,14],[15,20],[9,15],[12,16],[14,21],[18,24]].forEach(([a,b],i)=>{const v=lcm(a,b);add(2,a+" 和 "+b+" 的最小公倍數是多少？",v,[v+a,v*2,Math.max(a,b)],"共同倍數中最小的正整數是 "+v+"。",i<5?"基礎":"進階")});
+ [
+ ["18 顆紅球和 30 顆藍球平均分成內容相同且最多的幾組？",18,30,"組","g"],
+ ["每 4 分鐘響一次的鈴和每 6 分鐘響一次的鐘同時響，幾分鐘後再次同時響？",4,6,"分鐘","l"],
+ ["長 24 公分和 36 公分的緞帶剪成相同且最長的小段，每段幾公分？",24,36,"公分","g"],
+ ["甲公車每 8 分鐘、乙公車每 12 分鐘發車，幾分鐘後再次同時發車？",8,12,"分鐘","l"],
+ ["32 顆糖和 40 顆餅乾平均分成最多份，最多幾份？",32,40,"份","g"],
+ ["紅燈每 9 秒、藍燈每 12 秒閃一次，同時閃後幾秒再次同時閃？",9,12,"秒","l"],
+ ["42 公分和 56 公分緞帶剪成相同且最長的小段，每段長幾公分？",42,56,"公分","g"],
+ ["甲每 5 天、乙每 7 天整理一次書架，今天同時整理，幾天後再次同一天整理？",5,7,"天","l"],
+ ["24 位男生和 36 位女生平均分組，組數最多可以分成幾組？",24,36,"組","g"],
+ ["兩個提示燈分別每 6 秒和 10 秒閃一次，同時閃後幾秒再次同時閃？",6,10,"秒","l"]
+ ].forEach(([p,a,b,u,k],i)=>{const v=k==="g"?gcd(a,b):lcm(a,b);add(3,p,v+u,[((k==="g"?v+1:v+a))+u,(v*2)+u,Math.max(a,b)+u],(k==="g"?"平均分組或等長剪裁，求最大公因數。":"週期再次重合，求最小公倍數。")+"答案是 "+v+u+"。",i<5?"基礎":"應用")});
+ [
+ ["36 和 48 的最大公因數是多少？",36,48,"g"],["10 和 15 的最小公倍數是多少？",10,15,"l"],
+ ["16 和 24 的最大公因數是多少？",16,24,"g"],["12 和 20 的最小公倍數是多少？",12,20,"l"],
+ ["40 顆糖和 56 顆餅乾平均分成最多份，最多幾份？",40,56,"g"],["每 8 分鐘與每 14 分鐘響一次的鬧鐘同時響後，幾分鐘後再次同時響？",8,14,"l"],
+ ["27 和 45 的最大公因數是多少？",27,45,"g"],["18 和 30 的最小公倍數是多少？",18,30,"l"],
+ ["48 公分和 60 公分緞帶剪成相同且最長的小段，每段幾公分？",48,60,"g"],["每 12 天和每 18 天舉行一次的活動今天同時舉行，幾天後再次同一天舉行？",12,18,"l"]
+ ].forEach(([p,a,b,k],i)=>{const v=k==="g"?gcd(a,b):lcm(a,b);add(4,p,v,[k==="g"?v+2:v+a,v*2,Math.max(a,b)],(k==="g"?"這題求最大公因數。":"這題求最小公倍數。")+"計算結果是 "+v+"。",i<5?"混合":"挑戰")});
+ return bank;
+}
+const unitOneBank=buildUnitOneBank();
 function makeQuestions(level){
- const pool=[];
- if(level===0){
-  for(let i=0;i<24;i++){const n=rand(12,48),k=rand(2,8);
-   if(i%3===0){const fs=Array.from({length:n},(_,j)=>j+1).filter(x=>n%x===0).join("、");pool.push(makeQ(n+" 的所有正因數是哪一組？",fs,[fs+"、"+(n+1),"1、"+n,"2、3、5"],"能整除 "+n+" 且沒有餘數的數，才是它的因數。"))}
-   else if(i%3===1){const v=n*k;pool.push(makeQ(n+" 的第 "+k+" 個正倍數是多少？",v,[v+n,v-n,n+k],n+" × "+k+" ＝ "+v+"。"))}
-   else{const a=rand(2,9),b=rand(2,9),x=a*n,y=b*n,g=gcd(x,y);pool.push(makeQ(x+" 和 "+y+" 的最大公因數是多少？",g,[g+1,g*2,Math.min(x,y)],"共同因數中最大的數是 "+g+"。"))}
-  }
- }else if(level===1){
-  for(let i=0;i<24;i++){const a=rand(2,12),b=rand(2,12),m=rand(2,5),x=a*m,y=b*m,g=gcd(x,y);pool.push(makeQ(x+" 和 "+y+" 的最大公因數是多少？",g,[g*2,g+2,Math.max(x,y)],"兩數共同因數中最大的數是 "+g+"。"))}
- }else if(level===2){
-  for(let i=0;i<24;i++){const a=rand(2,12),b=rand(2,12),m=rand(2,5),x=a*m,y=b*m,v=lcm(x,y);pool.push(makeQ(x+" 和 "+y+" 的最小公倍數是多少？",v,[v+m,v*2,Math.max(x,y)],"最小共同倍數是 "+v+"。"))}
- }else if(level===3){
-  for(let i=0;i<24;i++){const a=rand(3,12),b=rand(3,12);
-   if(i%3===0){const x=a*2,y=b*2,v=gcd(x,y);pool.push(makeQ(x+" 顆紅球和 "+y+" 顆藍球分成內容相同且最多的幾組？",v,[v+2,lcm(x,y),a+b],"平均分成最多組，求最大公因數。"))}
-   else if(i%3===1){const v=lcm(a,b);pool.push(makeQ("甲每 "+a+" 分鐘響一次，乙每 "+b+" 分鐘響一次，現在同時響，幾分鐘後再次同時響？",v,[gcd(a,b),v+a,v+b],"週期重合，求最小公倍數。"))}
-   else{const x=a*6,y=b*6,v=gcd(x,y);pool.push(makeQ("長 "+x+" 公分和 "+y+" 公分的緞帶，剪成相同且最長的小段，每段幾公分？",v,[v*2,Math.abs(x-y),lcm(x,y)],"等長切割且要最長，求最大公因數。"))}
-  }
- }else{
-  for(let i=0;i<24;i++){const a=rand(3,12),b=rand(3,12),m=rand(2,4),x=a*m,y=b*m;
-   if(i%2===0){const v=gcd(x,y);pool.push(makeQ(x+" 位同學和 "+y+" 張卡片平均分成最多份，最多幾份？",v,[lcm(x,y),v+m,Math.max(x,y)],"平均分配成最多份，求最大公因數。"))}
-   else{const v=lcm(a,b);pool.push(makeQ("兩個提示燈分別每 "+a+" 秒和每 "+b+" 秒閃一次，同時閃後幾秒再次同時？",v,[gcd(a,b),v+a,v+b],"週期同時發生，求最小公倍數。"))}
-  }
- }
+ const pool=unitOneBank[level].map(q=>makeQ(q[0],q[1],q[2],q[3]).concat(q[4]));
  for(let i=pool.length-1;i>0;i--){const j=rand(0,i);[pool[i],pool[j]]=[pool[j],pool[i]]}
  return pool.slice(0,5);
 }
