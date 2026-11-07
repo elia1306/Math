@@ -178,7 +178,7 @@ if(!Array.isArray(state.evidence)){state={done:[],correct:0,wrong:{},stars:0,bad
 state.stars=state.stars||0;state.badges=state.badges||[];state.rewarded=state.rewarded||[];state.evidence=state.evidence||[];state.caseSolved=state.caseSolved||false;let current=0;
 const nav=document.getElementById("nav"),content=document.getElementById("content");
 function save(){localStorage.setItem("mathQuest",JSON.stringify(state));stats()}
-function stats(){document.getElementById("suspects").innerHTML=suspectBoard();document.getElementById("evidenceList").innerHTML=state.evidence.length?state.evidence.map(e=>"<p>🔎 "+e+"</p>").join(""):"尚未取得證物";const completed=selectedUnit===2&&typeof unitThreeProgress!=="undefined"?unitThreeProgress.done.length:selectedUnit===1&&typeof unitTwoProgress!=="undefined"?unitTwoProgress.done.length:state.done.length;document.getElementById("progressText").textContent=completed+" / 5 關";document.getElementById("progressBar").style.width=completed*20+"%";document.getElementById("correctCount").textContent=state.correct+(typeof unitTwoProgress!=="undefined"?unitTwoProgress.correct:0)+(typeof unitThreeProgress!=="undefined"?unitThreeProgress.correct:0);document.getElementById("wrongCount").textContent=Object.keys(state.wrong).length+(typeof unitTwoProgress!=="undefined"?Object.keys(unitTwoProgress.wrong).length:0)+(typeof unitThreeProgress!=="undefined"?Object.keys(unitThreeProgress.wrong).length:0);document.getElementById("starCount").textContent=state.stars+" ⭐";document.getElementById("badgeCount").textContent=state.badges.length+" 🏅";document.getElementById("badges").innerHTML=state.badges.length?"🏅 我的徽章： "+state.badges.map(x=>"<span class='badge'>"+x+"</span>").join(""):"🎁 完成關卡收集徽章！"}
+function stats(){document.getElementById("suspects").innerHTML=suspectBoard();document.getElementById("evidenceList").innerHTML=state.evidence.length?state.evidence.map(e=>"<p>🔎 "+e+"</p>").join(""):"尚未取得證物";const completed=selectedUnit===2&&typeof unitThreeProgress!=="undefined"?unitThreeProgress.done.length:selectedUnit===1&&typeof unitTwoProgress!=="undefined"?unitTwoProgress.done.length:state.done.length;document.getElementById("progressText").textContent=completed+" / 5 關";document.getElementById("progressBar").style.width=completed*20+"%";document.getElementById("correctCount").textContent=state.correct+(typeof unitTwoProgress!=="undefined"?unitTwoProgress.correct:0)+(typeof unitThreeProgress!=="undefined"?unitThreeProgress.correct:0)+(typeof unitFourProgress!=="undefined"?unitFourProgress.correct:0);document.getElementById("wrongCount").textContent=Object.keys(state.wrong).length+(typeof unitTwoProgress!=="undefined"?Object.keys(unitTwoProgress.wrong).length:0)+(typeof unitThreeProgress!=="undefined"?Object.keys(unitThreeProgress.wrong).length:0)+(typeof unitFourProgress!=="undefined"?Object.keys(unitFourProgress.wrong).length:0);document.getElementById("starCount").textContent=state.stars+" ⭐";document.getElementById("badgeCount").textContent=state.badges.length+" 🏅";document.getElementById("badges").innerHTML=state.badges.length?"🏅 我的徽章： "+state.badges.map(x=>"<span class='badge'>"+x+"</span>").join(""):"🎁 完成關卡收集徽章！"}
 function menu(){
  if(selectedUnit===0){
   nav.innerHTML=lessons.map((l,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-i='"+i+"' "+(i>0&&!state.done.includes(i-1)?"disabled":"")+">"+(state.done.includes(i)?"🏆 ":"🗝️ ")+l.title+"<small>"+l.sub+"</small></button>").join("");
@@ -186,7 +186,8 @@ function menu(){
   return;
  }
  const stages=["觀念入門","例題解析","基礎練習","生活應用","單元總複習"];
- nav.innerHTML="<p class='callout'>📘 "+semesterUnits[selectedUnit]+"｜關卡地圖</p>"+stages.map((s,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-stage='"+i+"'>🔒 第 "+(i+1)+" 關｜"+s+"<small>教學與題庫尚待建立</small></button>").join("");
+ const open=selectedUnit===1||selectedUnit===2||selectedUnit===3;
+ nav.innerHTML="<p class='callout'>📘 "+semesterUnits[selectedUnit]+"｜關卡地圖</p>"+stages.map((s,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-stage='"+i+"'>🔒 第 "+(i+1)+" 關｜"+s+"<small>"+(open?"教學與題庫已開放":"教學與題庫尚待建立")+"</small></button>").join("");
  nav.querySelectorAll("button[data-stage]").forEach(b=>b.onclick=()=>{current=Number(b.dataset.stage);showUnitStage(current)});
 }
 const unitTwoLessons=[
@@ -322,9 +323,85 @@ function saveUnitThree(){localStorage.setItem("mathQuestUnit3",JSON.stringify(un
 function renderUnitThree(stage){current=stage;menu();const lesson=unitThreeLessons[stage];activeQuestions=makeUnitThreeQuestions(stage);content.innerHTML="<span class='pill'>📚 六上第 3 單元｜小數除法</span><div class='case-stamp'>UNIT 03 · STAGE 0"+(stage+1)+"</div><div class='case-story'><p>"+lesson.story+"</p></div>"+lesson.body+"<h3>🔎 本關隨堂測驗</h3><p>每關 10 題隨機抽 5 題，提交後顯示答案與解析。</p><div id='quiz'></div><div class='actions'><button class='primary' id='finish'>提交答案</button><button class='secondary' id='next'>下一關 →</button></div><div id='result'></div>";document.getElementById("quiz").innerHTML=activeQuestions.map((q,i)=>"<div class='question'><b>"+(i+1)+". "+q[0]+"</b><span class='pill'>練習題</span>"+q[1].map((o,j)=>"<label class='option'><input type='radio' name='q"+i+"' value='"+j+"'> "+String.fromCharCode(65+j)+". "+o+"</label>").join("")+"<div id='f"+i+"'></div></div>").join("");document.getElementById("finish").onclick=gradeUnitThree;document.getElementById("next").onclick=()=>{if(!unitThreeProgress.done.includes(stage)){document.getElementById("result").innerHTML="<p class='feedback bad'>請先完成本關 5 題，再前往下一關。</p>";return}if(stage<4)renderUnitThree(stage+1);else document.getElementById("result").innerHTML="<p class='good feedback'>第三單元五關完成！可以重新挑戰。</p>"}}
 function gradeUnitThree(){const picks=activeQuestions.map((q,i)=>document.querySelector("input[name=q"+i+"]:checked"));if(picks.some(p=>!p)){document.getElementById("result").innerHTML="<p class='feedback bad'>請回答全部 5 題再提交。</p>";return}let score=0;activeQuestions.forEach((q,i)=>{const key=current+"-"+q[0],f=document.getElementById("f"+i);if(+picks[i].value===q[2]){score++;unitThreeProgress.correct++;delete unitThreeProgress.wrong[key];f.innerHTML="<div class='feedback good'>答對了！"+q[3]+"</div>"}else{unitThreeProgress.wrong[key]={question:q[0],correct:q[1][q[2]],why:q[3]};f.innerHTML="<div class='feedback bad'>正確答案："+q[1][q[2]]+"。"+q[3]+"</div>"}});if(!unitThreeProgress.done.includes(current))unitThreeProgress.done.push(current);saveUnitThree();menu();document.getElementById("result").innerHTML="<p class='score'>本次答對 "+score+" / 5 題</p><p class='callout'>"+(score===5?"太棒了，全部答對！":"仔細看每題解析，弄懂小數點移動步驟。")+" 本關完成紀錄已保存。</p>"}
 
+
+const unitFourLessons=[
+{story:"偵探室收到一張校慶海報：紅隊有 2 面旗，藍隊有 3 面旗。要描述兩隊旗子的數量關係，得先認識「比」的記法。",body:"<h2>🔍 比的意義與記法</h2><p>比是用來比較兩個同類量的關係。紅隊 2 面、藍隊 3 面，可以記作 <b>2：3</b>，讀作「2 比 3」。前面的數叫前項，後面的數叫後項。</p><div class='example'>2：3 中，前項是 2，後項是 3。<br>比的前項和後項順序不同，代表的關係也不同，例如 2：3 和 3：2 不相同。</div><div class='callout'>先確認比較的兩個量與順序，再寫成「前項：後項」。</div>"},
+{story:"現場找到兩杯不同濃度的果汁紀錄。線索不只要寫出比，還要知道前項除以後項是多少，這個數就是比值。",body:"<h2>🧮 比值怎麼求？</h2><p>比值就是比的前項除以後項。比 a：b 的比值是 a ÷ b（b 不可為 0）。</p><div class='example'>6：3 的比值＝6 ÷ 3＝2<br>2：5 的比值＝2 ÷ 5＝2/5</div><div class='callout'>比是兩個數的關係記法；比值是前項除以後項得到的數。</div>"},
+{story:"兩張證物卡寫著 6：9 和 2：3。它們看起來不同，卻可能代表相同的關係。請找出相等的比，並把比化到最簡。",body:"<h2>🧩 相等的比與最簡整數比</h2><p>比的前項和後項同時乘以或除以相同的非零數，比值不變，得到相等的比。</p><div class='example'>6：9 的前項、後項同除以 3，得到 2：3。<br>2 和 3 沒有大於 1 的公因數，所以 2：3 是最簡整數比。</div><div class='callout'>化簡比：前項、後項同除以它們的最大公因數，不能只改其中一項。</div>"},
+{story:"校慶佈置需要依照指定比例調配顏料與安排隊伍。請根據比的關係，求出缺少的數量，破解佈置室的密碼。",body:"<h2>🎨 比的應用</h2><p>解決比的應用題時，先確認前項、後項代表什麼，再利用相等的比求未知量。</p><div class='example'>紅色與黃色顏料的比是 2：3。若紅色用 4 杯，前項由 2 變成 4（乘以 2），黃色也要由 3 乘以 2，為 6 杯。</div><div class='callout'>相等的比要同時乘或除相同的數，兩項的倍數關係要一致。</div>"},
+{story:"最後的證物混合比的記法、比值、化簡與生活應用。讀清楚比較順序，列出相等的比，再完成終極推理！",body:"<h2>👑 比與比值總複習</h2><div class='callout'>檢查四件事：①比的順序 ②前項÷後項求比值 ③兩項同除最大公因數化簡 ④應用題兩項同倍數變化。</div>"}
+];
+function buildUnitFourBank(){return [
+[
+["甲有 2 顆球，乙有 5 顆球。甲對乙的球數比怎麼記？","2：5",["5：2","2：7","5：7"],"甲對乙，先寫甲再寫乙，所以是 2：5。"],
+["紅色積木 3 個、藍色積木 4 個。紅色對藍色的比是？","3：4",["4：3","3：7","4：7"],"依照紅色對藍色的順序，寫成 3：4。"],
+["比 7：9 的前項是多少？","7",["9","16","2"],"冒號前面的數是前項，所以是 7。"],
+["比 6：11 的後項是多少？","11",["6","17","5"],"冒號後面的數是後項，所以是 11。"],
+["哥哥有 8 張卡片，弟弟有 3 張。哥哥對弟弟的卡片張數比是？","8：3",["3：8","8：11","3：11"],"哥哥對弟弟，順序是 8：3。"],
+["比 4：7 表示哪一種關係？","前項 4、後項 7",["前項 7、後項 4","4 加 7 等於 11","4 減 7 等於 3"],"比 4：7 的前項是 4，後項是 7。"],
+["A 組 5 人、B 組 2 人，B 組對 A 組的人數比是？","2：5",["5：2","2：7","5：7"],"題目要求 B 對 A，所以是 2：5。"],
+["比 12：5 中，哪個數在前面？","12",["5","17","7"],"比的前項寫在前面，是 12。"],
+["比 1：4 的意思是？","前項是 1，後項是 4",["前項是 4，後項是 1","1 加 4","4 減 1"],"1：4 表示前項 1、後項 4。"],
+["一盒彩筆有紅色 6 枝、綠色 6 枝，紅色對綠色的比是？","6：6",["1：6","6：1","6：12"],"紅色 6 枝對綠色 6 枝，寫成 6：6。"]
+],
+[
+["比 8：4 的比值是多少？","2",["4","1/2","12"],"比值＝前項÷後項＝8÷4＝2。"],
+["比 3：5 的比值是多少？","3/5",["5/3","8","2"],"3÷5＝3/5。"],
+["比 12：3 的比值是多少？","4",["3","1/4","15"],"12÷3＝4。"],
+["比 2：7 的比值是多少？","2/7",["7/2","9","5"],"2÷7＝2/7。"],
+["比 9：6 的比值是多少？","3/2",["2/3","15","3"],"9÷6＝9/6＝3/2。"],
+["比 5：1 的比值是多少？","5",["1/5","6","4"],"5÷1＝5。"],
+["比 4：10 的比值是多少？","2/5",["5/2","14","6"],"4÷10 約分為 2/5。"],
+["比 15：5 的比值是多少？","3",["5","1/3","20"],"15÷5＝3。"],
+["比 7：2 的比值是多少？","7/2",["2/7","9","5"],"7÷2＝7/2。"],
+["比 6：8 的比值是多少？","3/4",["4/3","14","2"],"6÷8＝6/8＝3/4。"]
+],
+[
+["把 6：9 化成最簡整數比。","2：3",["3：2","6：3","2：9"],"6 和 9 同除以最大公因數 3，得到 2：3。"],
+["把 10：15 化成最簡整數比。","2：3",["3：2","5：15","2：5"],"10 和 15 同除以 5，得到 2：3。"],
+["把 12：8 化成最簡整數比。","3：2",["2：3","6：4","3：4"],"12 和 8 同除以最大公因數 4，得到 3：2。"],
+["把 14：21 化成最簡整數比。","2：3",["3：2","7：21","2：7"],"14 和 21 同除以 7，得到 2：3。"],
+["哪一個比和 3：4 相等？","6：8",["6：7","3：8","4：6"],"3：4 的前項、後項同乘 2，得到 6：8。"],
+["哪一個比和 2：5 相等？","8：20",["8：10","4：5","5：8"],"2：5 同乘 4，得到 8：20。"],
+["把 18：24 化成最簡整數比。","3：4",["4：3","9：12","2：3"],"18 和 24 同除以 6，得到 3：4。"],
+["把 16：20 化成最簡整數比。","4：5",["5：4","8：10","2：5"],"16 和 20 同除以 4，得到 4：5。"],
+["比 5：7 的前項和後項同乘 3，得到？","15：21",["5：21","15：7","8：10"],"兩項同乘 3，得到 15：21。"],
+["比 4：9 的前項和後項同除以 2，得到？","2：4.5",["2：9","4：4.5","8：18"],"4÷2＝2，9÷2＝4.5，所以是 2：4.5。"]
+],
+[
+["男生與女生人數比是 2：3，男生有 4 人，女生有幾人？","6",["5","7","8"],"2 變成 4 是乘 2，女生 3 也乘 2，為 6 人。"],
+["紅球與藍球比是 3：5，紅球有 9 顆，藍球有幾顆？","15",["12","18","20"],"3 乘 3 得 9，5 也乘 3 得 15。"],
+["果汁中果汁原液與水的比是 1：4，原液 2 杯，水要幾杯？","8",["4","6","10"],"1 乘 2 得 2，4 也乘 2 得 8 杯。"],
+["甲、乙兩數的比是 4：7，甲數是 12，乙數是多少？","21",["16","19","24"],"4 乘 3 得 12，7 也乘 3 得 21。"],
+["一盒彩珠紅色與黃色的比是 2：3，共有 10 顆，紅色有幾顆？","4",["5","6","8"],"總份數 2+3＝5，每份 10÷5＝2，紅色 2×2＝4 顆。"],
+["男生與女生人數比是 3：2，共有 25 人，女生有幾人？","10",["12","15","20"],"總份數 3+2＝5，每份 25÷5＝5，女生 2×5＝10 人。"],
+["麵粉與糖的重量比是 5：2，麵粉 15 公克，糖要幾公克？","6",["5","10","12"],"5 乘 3 得 15，2 也乘 3 得 6 公克。"],
+["A、B 兩地距離比是 2：5，若較短距離代表 6 公里，較長距離是多少？","15 公里",["10 公里","12 公里","18 公里"],"2 份是 6 公里，1 份 3 公里，5 份是 15 公里。"],
+["紅、白緞帶長度比 4：3，紅緞帶 20 公分，白緞帶多長？","15 公分",["12 公分","16 公分","18 公分"],"4 份變成 20 公分，每份 5 公分，白色 3 份是 15 公分。"],
+["兩數比是 2：3，兩數合起來是 40，較大的數是多少？","24",["16","20","30"],"總份數 5，每份 40÷5＝8，較大數 3×8＝24。"]
+],
+[
+["比 8：12 的最簡整數比是？","2：3",["3：2","4：6","2：4"],"同除以 4，得到 2：3。"],
+["比 5：8 的比值是多少？","5/8",["8/5","13","3"],"5÷8＝5/8。"],
+["甲乙人數比 3：4，甲有 12 人，乙有幾人？","16",["9","15","18"],"3 乘 4 得 12，4 也乘 4 得 16。"],
+["比 20：25 化簡後是？","4：5",["5：4","2：5","10：15"],"20 和 25 同除以 5，得到 4：5。"],
+["比 7：1 的比值是？","7",["1/7","8","6"],"7÷1＝7。"],
+["兩數比 2：5，總和 35，較小的數是多少？","10",["14","15","25"],"總份數 7，每份 5，較小數 2×5＝10。"],
+["哪一個比與 4：6 相等？","2：3",["2：4","3：2","4：3"],"4：6 同除以 2，得到 2：3。"],
+["比 9：4 的比值是多少？","9/4",["4/9","13","5"],"9÷4＝9/4。"],
+["藍色與黃色卡片比 3：2，黃色有 8 張，藍色有幾張？","12",["10","14","16"],"2 份是 8 張，1 份 4 張，藍色 3 份是 12 張。"],
+["比 15：10 的最簡整數比是？","3：2",["2：3","5：2","3：5"],"15 和 10 同除以 5，得到 3：2。"]
+]
+];}
+const unitFourBank=buildUnitFourBank();
+function makeUnitFourQuestions(stage){const pool=unitFourBank[stage].map(q=>makeQ(q[0],q[1],q[2],q[3]).concat("練習"));for(let i=pool.length-1;i>0;i--){const j=rand(0,i);[pool[i],pool[j]]=[pool[j],pool[i]]}return pool.slice(0,5)}
+let unitFourProgress=JSON.parse(localStorage.getItem("mathQuestUnit4")||'{"done":[],"wrong":{},"correct":0}');
+function saveUnitFour(){localStorage.setItem("mathQuestUnit4",JSON.stringify(unitFourProgress))}
+function renderUnitFour(stage){current=stage;menu();const lesson=unitFourLessons[stage];activeQuestions=makeUnitFourQuestions(stage);content.innerHTML="<span class='pill'>📚 六上第 4 單元｜比與比值</span><div class='case-stamp'>UNIT 04 · STAGE 0"+(stage+1)+"</div><div class='case-story'><p>"+lesson.story+"</p></div>"+lesson.body+"<h3>🔎 本關隨堂測驗</h3><p>每關 10 題隨機抽 5 題，提交後顯示答案與解析。</p><div id='quiz'></div><div class='actions'><button class='primary' id='finish'>提交答案</button><button class='secondary' id='next'>下一關 →</button></div><div id='result'></div>";document.getElementById("quiz").innerHTML=activeQuestions.map((q,i)=>"<div class='question'><b>"+(i+1)+". "+q[0]+"</b><span class='pill'>練習題</span>"+q[1].map((o,j)=>"<label class='option'><input type='radio' name='q"+i+"' value='"+j+"'> "+String.fromCharCode(65+j)+". "+o+"</label>").join("")+"<div id='f"+i+"'></div></div>").join("");document.getElementById("finish").onclick=gradeUnitFour;document.getElementById("next").onclick=()=>{if(!unitFourProgress.done.includes(stage)){document.getElementById("result").innerHTML="<p class='feedback bad'>請先完成本關 5 題，再前往下一關。</p>";return}if(stage<4)renderUnitFour(stage+1);else document.getElementById("result").innerHTML="<p class='good feedback'>第四單元五關完成！可以重新挑戰不同題目。</p>"}}
+function gradeUnitFour(){const picks=activeQuestions.map((q,i)=>document.querySelector("input[name=q"+i+"]:checked"));if(picks.some(p=>!p)){document.getElementById("result").innerHTML="<p class='feedback bad'>請回答全部 5 題再提交。</p>";return}let score=0;activeQuestions.forEach((q,i)=>{const key=current+"-"+q[0],f=document.getElementById("f"+i);if(+picks[i].value===q[2]){score++;unitFourProgress.correct++;delete unitFourProgress.wrong[key];f.innerHTML="<div class='feedback good'>答對了！"+q[3]+"</div>"}else{unitFourProgress.wrong[key]={question:q[0],correct:q[1][q[2]],why:q[3]};f.innerHTML="<div class='feedback bad'>正確答案："+q[1][q[2]]+"。"+q[3]+"</div>"}});if(!unitFourProgress.done.includes(current))unitFourProgress.done.push(current);saveUnitFour();menu();document.getElementById("result").innerHTML="<p class='score'>本次答對 "+score+" / 5 題</p><p class='callout'>"+(score===5?"太棒了，全部答對！":"仔細看每題解析，確認比的順序與兩項的倍數關係。")+" 本關完成紀錄已保存。</p>"}
 function showUnitStage(stage){
  const stages=["觀念入門","例題解析","基礎練習","生活應用","單元總複習"];
- if(selectedUnit===1){renderUnitTwo(stage);return}if(selectedUnit===2){renderUnitThree(stage);return}
+ if(selectedUnit===1){renderUnitTwo(stage);return}if(selectedUnit===2){renderUnitThree(stage);return}if(selectedUnit===3){renderUnitFour(stage);return}
  menu();
  content.innerHTML="<span class='pill'>📚 六上第 "+(selectedUnit+1)+" 單元</span><h2>"+semesterUnits[selectedUnit]+"</h2><div class='case-story'><p>第 "+(stage+1)+" 關｜"+stages[stage]+"</p></div><div class='callout'>這個單元的教學內容與題庫尚在建置中；目前不會拿其他單元的題目代替。</div><button class='secondary' id='unitHome'>返回本單元關卡地圖</button>";
  document.getElementById("unitHome").onclick=()=>{current=0;showUnitStage(0)};
@@ -361,7 +438,7 @@ let selectedUnit=0;
 function drawUnitPicker(){
  const box=document.getElementById("unitPicker");
  if(!box)return;
- box.innerHTML=semesterUnits.map((name,i)=>"<button type='button' class='unit-choice "+(i===selectedUnit?"active":"")+"' data-unit='"+i+"' aria-pressed='"+(i===selectedUnit)+"'>"+(i+1)+". "+name+"<small>"+(i===0?"完整關卡已開放":i===1||i===2?"50 題題庫已開放":"已建立關卡地圖｜內容建置中")+"</small></button>").join("");
+ box.innerHTML=semesterUnits.map((name,i)=>"<button type='button' class='unit-choice "+(i===selectedUnit?"active":"")+"' data-unit='"+i+"' aria-pressed='"+(i===selectedUnit)+"'>"+(i+1)+". "+name+"<small>"+(i===0?"完整關卡已開放":i===1||i===2||i===3?"50 題題庫已開放":"已建立關卡地圖｜內容建置中")+"</small></button>").join("");
  box.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
    selectedUnit=Number(b.dataset.unit);
    current=0;
@@ -371,6 +448,6 @@ function drawUnitPicker(){
  }));
 }
 
-document.getElementById("reviewWrong").onclick=()=>{let a=Object.values(state.wrong).concat(typeof unitTwoProgress!=="undefined"?Object.values(unitTwoProgress.wrong):[],typeof unitThreeProgress!=="undefined"?Object.values(unitThreeProgress.wrong):[]);content.innerHTML="<h2>📒 我的錯題本</h2>"+(a.length?a.map((x,i)=>"<div class='question'><b>"+(i+1)+". "+x.question+"</b><p class='good'>正確答案："+x.correct+"</p><p>"+x.why+"</p></div>").join(""):"<p class='callout'>目前沒有待訂正錯題，真棒！</p>")+"<button class='secondary' id='return'>返回課程</button>";document.getElementById("return").onclick=()=>{if(selectedUnit===1)showUnitStage(current);else if(selectedUnit===0)render();else showUnitStage(current)}};
-document.getElementById("reset").onclick=()=>{if(confirm("確定清除所有星星、徽章與紀錄？")){state={done:[],correct:0,wrong:{},stars:0,badges:[],rewarded:[],evidence:[],caseSolved:false};unitTwoProgress={done:[],wrong:{},correct:0};saveUnitTwo();unitThreeProgress={done:[],wrong:{},correct:0};saveUnitThree();save();current=0;if(selectedUnit===0)render();else showUnitStage(0)}};stats();drawUnitPicker();render();
+document.getElementById("reviewWrong").onclick=()=>{let a=Object.values(state.wrong).concat(typeof unitTwoProgress!=="undefined"?Object.values(unitTwoProgress.wrong):[],typeof unitThreeProgress!=="undefined"?Object.values(unitThreeProgress.wrong):[]).concat(typeof unitFourProgress!=="undefined"?Object.values(unitFourProgress.wrong):[]);content.innerHTML="<h2>📒 我的錯題本</h2>"+(a.length?a.map((x,i)=>"<div class='question'><b>"+(i+1)+". "+x.question+"</b><p class='good'>正確答案："+x.correct+"</p><p>"+x.why+"</p></div>").join(""):"<p class='callout'>目前沒有待訂正錯題，真棒！</p>")+"<button class='secondary' id='return'>返回課程</button>";document.getElementById("return").onclick=()=>{if(selectedUnit===0)render();else showUnitStage(current)}};
+document.getElementById("reset").onclick=()=>{if(confirm("確定清除所有星星、徽章與紀錄？")){state={done:[],correct:0,wrong:{},stars:0,badges:[],rewarded:[],evidence:[],caseSolved:false};unitTwoProgress={done:[],wrong:{},correct:0};saveUnitTwo();unitThreeProgress={done:[],wrong:{},correct:0};saveUnitThree();unitFourProgress={done:[],wrong:{},correct:0};saveUnitFour();save();current=0;if(selectedUnit===0)render();else showUnitStage(0)}};stats();drawUnitPicker();render();
 </script></body></html>
