@@ -169,7 +169,22 @@ state.stars=state.stars||0;state.badges=state.badges||[];state.rewarded=state.re
 const nav=document.getElementById("nav"),content=document.getElementById("content");
 function save(){localStorage.setItem("mathQuest",JSON.stringify(state));stats()}
 function stats(){document.getElementById("suspects").innerHTML=suspectBoard();document.getElementById("evidenceList").innerHTML=state.evidence.length?state.evidence.map(e=>"<p>🔎 "+e+"</p>").join(""):"尚未取得證物";document.getElementById("progressText").textContent=state.done.length+" / 5 關";document.getElementById("progressBar").style.width=state.done.length*20+"%";document.getElementById("correctCount").textContent=state.correct;document.getElementById("wrongCount").textContent=Object.keys(state.wrong).length;document.getElementById("starCount").textContent=state.stars+" ⭐";document.getElementById("badgeCount").textContent=state.badges.length+" 🏅";document.getElementById("badges").innerHTML=state.badges.length?"🏅 我的徽章： "+state.badges.map(x=>"<span class='badge'>"+x+"</span>").join(""):"🎁 完成關卡收集徽章！"}
-function menu(){nav.innerHTML=lessons.map((l,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-i='"+i+"' "+(i>0&&!state.done.includes(i-1)?"disabled":"")+">"+(state.done.includes(i)?"🏆 ":"🗝️ ")+l.title+"<small>"+l.sub+"</small></button>").join("");nav.querySelectorAll("button").forEach(b=>b.onclick=()=>{if(!b.disabled){current=+b.dataset.i;render()}})}
+function menu(){
+ if(selectedUnit===0){
+  nav.innerHTML=lessons.map((l,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-i='"+i+"' "+(i>0&&!state.done.includes(i-1)?"disabled":"")+">"+(state.done.includes(i)?"🏆 ":"🗝️ ")+l.title+"<small>"+l.sub+"</small></button>").join("");
+  nav.querySelectorAll("button").forEach(b=>b.onclick=()=>{if(!b.disabled){current=+b.dataset.i;render()}});
+  return;
+ }
+ const stages=["觀念入門","例題解析","基礎練習","生活應用","單元總複習"];
+ nav.innerHTML="<p class='callout'>📘 "+semesterUnits[selectedUnit]+"｜關卡地圖</p>"+stages.map((s,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-stage='"+i+"'>🔒 第 "+(i+1)+" 關｜"+s+"<small>教學與題庫尚待建立</small></button>").join("");
+ nav.querySelectorAll("button[data-stage]").forEach(b=>b.onclick=()=>{current=Number(b.dataset.stage);showUnitStage(current)});
+}
+function showUnitStage(stage){
+ const stages=["觀念入門","例題解析","基礎練習","生活應用","單元總複習"];
+ menu();
+ content.innerHTML="<span class='pill'>📚 六上第 "+(selectedUnit+1)+" 單元</span><h2>"+semesterUnits[selectedUnit]+"</h2><div class='case-story'><p>第 "+(stage+1)+" 關｜"+stages[stage]+"</p></div><div class='callout'>這個單元的關卡選單已切換成功。教學內容、隨機 5 題題庫、答案解析及獨立進度尚未完成；目前不會拿第 1 單元的題目代替，避免練習到不相干的內容。</div><button class='secondary' id='unitHome'>返回本單元關卡地圖</button>";
+ document.getElementById("unitHome").onclick=()=>{current=0;showUnitStage(0)};
+}
 function render(){menu();let l=lessons[current];activeQuestions=makeQuestions(current);content.innerHTML="<span class='pill'>🕵️ 案件 "+(current+1)+"｜現場調查中</span><div class='case-stamp'>CASE FILE 0"+(current+1)+"</div><div class='case-story'><p>"+l.story+"</p></div>"+l.body+"<h3>🔎 案件推理測驗</h3><p>每次隨機抽出 5 題，題目與選項順序都會變化；提交後看解析、領星星！</p><div id='quiz'></div><div class='actions'><button class='primary' id='finish'>提交推理・取得線索</button><button class='secondary' id='next'>下一關 →</button></div><div id='result'></div>";document.getElementById("quiz").innerHTML=activeQuestions.map((q,i)=>"<div class='question'><b>"+(i+1)+". "+q[0]+"</b>"+q[1].map((o,j)=>"<label class='option'><input type='radio' name='q"+i+"' value='"+j+"'> "+String.fromCharCode(65+j)+". "+o+"</label>").join("")+"<div id='f"+i+"'></div></div>").join("");document.getElementById("finish").onclick=grade;document.getElementById("next").onclick=()=>{if(!state.done.includes(current)){document.getElementById("result").innerHTML="<p class='feedback bad'>先完成本關挑戰，才能前往下一關喔！</p>";return}if(current<4){current++;render()}else{summary()}}}
 function grade(){
  const picks=activeQuestions.map((q,i)=>document.querySelector("input[name=q"+i+"]:checked"));
@@ -202,14 +217,13 @@ let selectedUnit=0;
 function drawUnitPicker(){
  const box=document.getElementById("unitPicker");
  if(!box)return;
- box.innerHTML=semesterUnits.map((name,i)=>"<button type='button' class='unit-choice "+(i===selectedUnit?"active":"")+"' data-unit='"+i+"' aria-pressed='"+(i===selectedUnit)+"'>"+(i+1)+". "+name+"<small>"+(i===0?"目前已有完整偵探關卡":"單元已列入複習地圖")+"</small></button>").join("");
+ box.innerHTML=semesterUnits.map((name,i)=>"<button type='button' class='unit-choice "+(i===selectedUnit?"active":"")+"' data-unit='"+i+"' aria-pressed='"+(i===selectedUnit)+"'>"+(i+1)+". "+name+"<small>"+(i===0?"完整關卡已開放":"已建立關卡地圖｜內容建置中")+"</small></button>").join("");
  box.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
-   const n=Number(b.dataset.unit);
-   if(n!==0){
-     document.getElementById("content").innerHTML="<h2>📚 第 "+(n+1)+" 單元｜"+semesterUnits[n]+"</h2><div class='callout'>已切換到這個單元！目前網站的完整隨機題庫與教學內容仍先以第 1 單元為主；其他單元已加入複習地圖，接下來會逐單元補上教學內容、隨機題庫與答題紀錄。</div><p>你可以先在這裡選擇想複習的單元；尚未學過的單元也可以先不練習，不會影響第 1 單元的進度。</p><button class='primary' id='backUnitOne'>返回第 1 單元</button>";
-     selectedUnit=n;drawUnitPicker();
-     document.getElementById("backUnitOne").onclick=()=>{selectedUnit=0;drawUnitPicker();current=0;render()};
-   }else{selectedUnit=0;drawUnitPicker();current=0;render()}
+   selectedUnit=Number(b.dataset.unit);
+   current=0;
+   drawUnitPicker();
+   if(selectedUnit===0){render()}
+   else{showUnitStage(0)}
  }));
 }
 
