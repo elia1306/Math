@@ -178,7 +178,7 @@ if(!Array.isArray(state.evidence)){state={done:[],correct:0,wrong:{},stars:0,bad
 state.stars=state.stars||0;state.badges=state.badges||[];state.rewarded=state.rewarded||[];state.evidence=state.evidence||[];state.caseSolved=state.caseSolved||false;let current=0;
 const nav=document.getElementById("nav"),content=document.getElementById("content");
 function save(){localStorage.setItem("mathQuest",JSON.stringify(state));stats()}
-function stats(){document.getElementById("suspects").innerHTML=suspectBoard();document.getElementById("evidenceList").innerHTML=state.evidence.length?state.evidence.map(e=>"<p>🔎 "+e+"</p>").join(""):"尚未取得證物";document.getElementById("progressText").textContent=state.done.length+" / 5 關";document.getElementById("progressBar").style.width=state.done.length*20+"%";document.getElementById("correctCount").textContent=state.correct;document.getElementById("wrongCount").textContent=Object.keys(state.wrong).length;document.getElementById("starCount").textContent=state.stars+" ⭐";document.getElementById("badgeCount").textContent=state.badges.length+" 🏅";document.getElementById("badges").innerHTML=state.badges.length?"🏅 我的徽章： "+state.badges.map(x=>"<span class='badge'>"+x+"</span>").join(""):"🎁 完成關卡收集徽章！"}
+function stats(){document.getElementById("suspects").innerHTML=suspectBoard();document.getElementById("evidenceList").innerHTML=state.evidence.length?state.evidence.map(e=>"<p>🔎 "+e+"</p>").join(""):"尚未取得證物";document.getElementById("progressText").textContent=state.done.length+" / 5 關";document.getElementById("progressBar").style.width=state.done.length*20+"%";document.getElementById("correctCount").textContent=state.correct;document.getElementById("wrongCount").textContent=Object.keys(state.wrong).length+(typeof unitTwoProgress!=="undefined"?Object.keys(unitTwoProgress.wrong).length:0);document.getElementById("starCount").textContent=state.stars+" ⭐";document.getElementById("badgeCount").textContent=state.badges.length+" 🏅";document.getElementById("badges").innerHTML=state.badges.length?"🏅 我的徽章： "+state.badges.map(x=>"<span class='badge'>"+x+"</span>").join(""):"🎁 完成關卡收集徽章！"}
 function menu(){
  if(selectedUnit===0){
   nav.innerHTML=lessons.map((l,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-i='"+i+"' "+(i>0&&!state.done.includes(i-1)?"disabled":"")+">"+(state.done.includes(i)?"🏆 ":"🗝️ ")+l.title+"<small>"+l.sub+"</small></button>").join("");
@@ -189,10 +189,67 @@ function menu(){
  nav.innerHTML="<p class='callout'>📘 "+semesterUnits[selectedUnit]+"｜關卡地圖</p>"+stages.map((s,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-stage='"+i+"'>🔒 第 "+(i+1)+" 關｜"+s+"<small>教學與題庫尚待建立</small></button>").join("");
  nav.querySelectorAll("button[data-stage]").forEach(b=>b.onclick=()=>{current=Number(b.dataset.stage);showUnitStage(current)});
 }
+const unitTwoLessons=[
+ {title:"觀念入門",story:"偵探收到一張配方卡：做一份點心需要 1/2 杯牛奶。手上有 3/2 杯牛奶，可以做幾份？這就是分數除法要解決的問題。",body:"<h2>🥛 分數除法在問什麼？</h2><p>分數除法可以用來解決「有多少個這樣的量」或「平均分成幾份」的問題。</p><div class='example'><b>例：3/4 ÷ 1/4</b><br>想成 3/4 裡面有幾個 1/4？答案是 3。<br><b>3/4 ÷ 1/4 ＝ 3</b></div><div class='callout'>先想一想：除以 1/4，等於問裡面有幾個 1/4。</div>"},
+ {title:"例題解析",story:"線索卡上出現「除以一個分數」。要解開密碼，記得分數除法的關鍵：除以一個不等於 0 的分數，等於乘以它的倒數。",body:"<h2>🔁 除以分數怎麼算？</h2><p>把除號改成乘號，並將<strong>除數</strong>變成倒數；被除數保持不變。</p><div class='example'><b>例：2/3 ÷ 4/5</b><br>＝ 2/3 × 5/4<br>＝ 10/12<br>＝ <b>5/6</b></div><div class='callout'>口訣：除號變乘號，後面分數上下交換；最後約分到最簡分數。</div>"},
+ {title:"基礎練習",story:"你找到一個算式鎖。只有正確使用倒數，才能打開下一個抽屜。計算時別忘了先看清楚哪一個是除數！",body:"<h2>✏️ 分數除法練習</h2><ol><li>確認除數不是 0。</li><li>把除號改成乘號。</li><li>將第二個分數寫成倒數。</li><li>約分並化成最簡分數。</li></ol><div class='example'>例如：3/5 ÷ 2/7<br>＝ 3/5 × 7/2<br>＝ 21/10</div>"},
+ {title:"生活應用",story:"活動室有 3/4 公尺的緞帶，每份佈置需要 1/8 公尺。能完成幾份？請把文字轉成算式，找出分數除法在生活中的用途。",body:"<h2>🎀 生活中的分數除法</h2><div class='callout'>「總量 ÷ 每份量＝可以分成幾份」；「總量 ÷ 份數＝每份是多少」。先判斷題目在問哪一種。</div><div class='example'>3/4 公尺緞帶，每份用 1/8 公尺：<br>3/4 ÷ 1/8 ＝ 3/4 × 8 ＝ 6（份）</div>"},
+ {title:"單元總複習",story:"最後的密碼混合了分數除法、倒數、約分與生活情境。請獨立判斷算法，完成最後五題，解開第二單元的謎題！",body:"<h2>🏁 分數除法總複習</h2><div class='callout'>檢查清單：①除數取倒數 ②除號改乘號 ③被除數不變 ④乘完約分 ⑤應用題寫上單位。</div>"}
+];
+function fraction(n,d){const g=gcd(Math.abs(n),Math.abs(d));n/=g;d/=g;return d===1?String(n):n+"/"+d}
+function buildUnitTwoBank(){
+ const bank=[[],[],[],[],[]];
+ const add=(s,p,a,why,wrong,d="基礎")=>bank[s].push([p,fraction(a[0],a[1]),wrong.map(x=>fraction(x[0],x[1])),why,d]);
+ const sets=[
+  [[3,4,1,4],[2,3,1,3],[5,6,1,6],[7,8,1,8],[4,5,2,5],[3,5,1,5],[5,8,1,8],[7,10,1,10],[2,5,2,5],[3,7,1,7]],
+  [[2,3,4,5],[3,4,2,5],[5,6,3,4],[4,7,2,3],[3,8,4,5],[5,9,2,3],[7,10,5,6],[2,7,3,4],[5,12,4,9],[7,9,2,3]],
+  [[3,5,2,7],[4,9,2,3],[5,8,3,4],[7,12,2,5],[3,10,4,7],[5,6,5,8],[7,15,7,10],[4,11,2,7],[5,14,5,7],[8,15,4,9]],
+  [[3,4,1,8],[5,6,1,6],[7,8,1,4],[2,3,1,9],[4,5,2,5],[5,8,1,4],[3,7,1,7],[7,10,1,5],[5,6,1,3],[9,10,3,10]],
+  [[2,3,3,4],[5,8,2,3],[7,9,1,3],[3,5,4,7],[5,12,5,6],[7,10,7,15],[4,9,2,3],[3,8,3,4],[5,7,10,21],[7,12,7,18]]
+ ];
+ sets.forEach((arr,s)=>arr.forEach(([a,b,c,d],i)=>{
+  const num=a*d,den=b*c,g=gcd(num,den),ans=[num/g,den/g];
+  const multiply=[a*c,b*d],flipWrong=[a*d,b*c],noFlip=[a*c,b*d];
+  const wrong=[multiply,flipWrong,[ans[0]+1,ans[1]]];
+  let prompt,why;
+  if(s===0){prompt=fraction(a,b)+" ÷ "+fraction(c,d)+" 的意思是什麼？請計算。";why="除以 "+fraction(c,d)+"，就是看 "+fraction(a,b)+" 裡有幾個 "+fraction(c,d)+"；計算結果為 "+fraction(ans[0],ans[1])+"。"}
+  else if(s===1){prompt=fraction(a,b)+" ÷ "+fraction(c,d)+" ＝？";why="除以 "+fraction(c,d)+"，改成乘以倒數 "+fraction(d,c)+"；"+fraction(a,b)+" × "+fraction(d,c)+"＝"+fraction(ans[0],ans[1])+"。"}
+  else if(s===2){prompt="計算並約成最簡分數："+fraction(a,b)+" ÷ "+fraction(c,d)+"。";why="先乘除數的倒數，再約分："+fraction(a,b)+" × "+fraction(d,c)+"＝"+fraction(ans[0],ans[1])+"。"}
+  else if(s===3){prompt="有 "+fraction(a,b)+" 公尺的緞帶，每份用 "+fraction(c,d)+" 公尺，可以做幾份？";why="總長 ÷ 每份長度＝份數："+fraction(a,b)+" ÷ "+fraction(c,d)+"＝"+fraction(ans[0],ans[1])+" 份。"}
+  else{prompt="單元總複習： "+fraction(a,b)+" ÷ "+fraction(c,d)+" 的結果是多少？";why="除以分數要乘以它的倒數："+fraction(a,b)+" × "+fraction(d,c)+"＝"+fraction(ans[0],ans[1])+"。"}
+  add(s,prompt,ans,why,wrong,i<5?"基礎":s===3?"應用":"進階");
+ }));
+ return bank;
+}
+const unitTwoBank=buildUnitTwoBank();
+function makeUnitTwoQuestions(stage){
+ const pool=unitTwoBank[stage].map(q=>makeQ(q[0],q[1],q[2],q[3]).concat(q[4]));
+ for(let i=pool.length-1;i>0;i--){const j=rand(0,i);[pool[i],pool[j]]=[pool[j],pool[i]]}
+ return pool.slice(0,5);
+}
+let unitTwoProgress=JSON.parse(localStorage.getItem("mathQuestUnit2")||'{"done":[],"wrong":{},"correct":0}');
+function saveUnitTwo(){localStorage.setItem("mathQuestUnit2",JSON.stringify(unitTwoProgress));}
+function renderUnitTwo(stage){
+ current=stage;menu();const lesson=unitTwoLessons[stage];activeQuestions=makeUnitTwoQuestions(stage);
+ content.innerHTML="<span class='pill'>📚 六上第 2 單元｜分數除法</span><div class='case-stamp'>UNIT 02 · STAGE 0"+(stage+1)+"</div><div class='case-story'><p>"+lesson.story+"</p></div>"+lesson.body+"<h3>🔎 本關隨堂測驗</h3><p>題庫每關 10 題，每次隨機抽 5 題；提交後會顯示答案與解題步驟。</p><div id='quiz'></div><div class='actions'><button class='primary' id='finish'>提交答案</button><button class='secondary' id='next'>下一關 →</button></div><div id='result'></div>";
+ document.getElementById("quiz").innerHTML=activeQuestions.map((q,i)=>"<div class='question'><b>"+(i+1)+". "+q[0]+"</b><span class='pill'>"+(q[4]||"練習")+"題</span>"+q[1].map((o,j)=>"<label class='option'><input type='radio' name='q"+i+"' value='"+j+"'> "+String.fromCharCode(65+j)+". "+o+"</label>").join("")+"<div id='f"+i+"'></div></div>").join("");
+ document.getElementById("finish").onclick=gradeUnitTwo;
+ document.getElementById("next").onclick=()=>{if(!unitTwoProgress.done.includes(stage)){document.getElementById("result").innerHTML="<p class='feedback bad'>請先完成本關 5 題，再前往下一關。</p>";return}if(stage<4)renderUnitTwo(stage+1);else{document.getElementById("result").innerHTML="<p class='good feedback'>🎉 第二單元五關完成！可以重新挑戰，練習不同題目。</p>"}};
+}
+function gradeUnitTwo(){
+ const picks=activeQuestions.map((q,i)=>document.querySelector("input[name=q"+i+"]:checked"));
+ if(picks.some(p=>!p)){document.getElementById("result").innerHTML="<p class='feedback bad'>請回答全部 5 題再提交。</p>";return}
+ let score=0;
+ activeQuestions.forEach((q,i)=>{const key=current+"-"+q[0];const f=document.getElementById("f"+i);if(+picks[i].value===q[2]){score++;unitTwoProgress.correct++;delete unitTwoProgress.wrong[key];f.innerHTML="<div class='feedback good'>答對了！"+q[3]+"</div>"}else{unitTwoProgress.wrong[key]={question:q[0],correct:q[1][q[2]],why:q[3]};f.innerHTML="<div class='feedback bad'>正確答案："+q[1][q[2]]+"。"+q[3]+"</div>"}});
+ if(!unitTwoProgress.done.includes(current))unitTwoProgress.done.push(current);
+ saveUnitTwo();menu();
+ document.getElementById("result").innerHTML="<p class='score'>本次答對 "+score+" / 5 題</p><p class='callout'>"+(score===5?"太棒了，全部答對！":"仔細看每題解析，弄懂倒數與約分的步驟。")+" 本關完成紀錄已保存。</p>";
+}
 function showUnitStage(stage){
  const stages=["觀念入門","例題解析","基礎練習","生活應用","單元總複習"];
+ if(selectedUnit===1){renderUnitTwo(stage);return}
  menu();
- content.innerHTML="<span class='pill'>📚 六上第 "+(selectedUnit+1)+" 單元</span><h2>"+semesterUnits[selectedUnit]+"</h2><div class='case-story'><p>第 "+(stage+1)+" 關｜"+stages[stage]+"</p></div><div class='callout'>這個單元的關卡選單已切換成功。教學內容、隨機 5 題題庫、答案解析及獨立進度尚未完成；目前不會拿第 1 單元的題目代替，避免練習到不相干的內容。</div><button class='secondary' id='unitHome'>返回本單元關卡地圖</button>";
+ content.innerHTML="<span class='pill'>📚 六上第 "+(selectedUnit+1)+" 單元</span><h2>"+semesterUnits[selectedUnit]+"</h2><div class='case-story'><p>第 "+(stage+1)+" 關｜"+stages[stage]+"</p></div><div class='callout'>這個單元的教學內容與題庫尚在建置中；目前不會拿其他單元的題目代替。</div><button class='secondary' id='unitHome'>返回本單元關卡地圖</button>";
  document.getElementById("unitHome").onclick=()=>{current=0;showUnitStage(0)};
 }
 function render(){menu();let l=lessons[current];activeQuestions=makeQuestions(current);content.innerHTML="<span class='pill'>🕵️ 案件 "+(current+1)+"｜現場調查中</span><div class='case-stamp'>CASE FILE 0"+(current+1)+"</div><div class='case-story'><p>"+l.story+"</p></div>"+l.body+"<h3>🔎 案件推理測驗</h3><p>每次隨機抽出 5 題，題目與選項順序都會變化；提交後看解析、領星星！</p><div id='quiz'></div><div class='actions'><button class='primary' id='finish'>提交推理・取得線索</button><button class='secondary' id='next'>下一關 →</button></div><div id='result'></div>";document.getElementById("quiz").innerHTML=activeQuestions.map((q,i)=>"<div class='question'><b>"+(i+1)+". "+q[0]+"</b>"+q[1].map((o,j)=>"<label class='option'><input type='radio' name='q"+i+"' value='"+j+"'> "+String.fromCharCode(65+j)+". "+o+"</label>").join("")+"<div id='f"+i+"'></div></div>").join("");document.getElementById("finish").onclick=grade;document.getElementById("next").onclick=()=>{if(!state.done.includes(current)){document.getElementById("result").innerHTML="<p class='feedback bad'>先完成本關挑戰，才能前往下一關喔！</p>";return}if(current<4){current++;render()}else{summary()}}}
@@ -227,7 +284,7 @@ let selectedUnit=0;
 function drawUnitPicker(){
  const box=document.getElementById("unitPicker");
  if(!box)return;
- box.innerHTML=semesterUnits.map((name,i)=>"<button type='button' class='unit-choice "+(i===selectedUnit?"active":"")+"' data-unit='"+i+"' aria-pressed='"+(i===selectedUnit)+"'>"+(i+1)+". "+name+"<small>"+(i===0?"完整關卡已開放":"已建立關卡地圖｜內容建置中")+"</small></button>").join("");
+ box.innerHTML=semesterUnits.map((name,i)=>"<button type='button' class='unit-choice "+(i===selectedUnit?"active":"")+"' data-unit='"+i+"' aria-pressed='"+(i===selectedUnit)+"'>"+(i+1)+". "+name+"<small>"+(i===0?"完整關卡已開放":i===1?"50 題題庫已開放":"已建立關卡地圖｜內容建置中")+"</small></button>").join("");
  box.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
    selectedUnit=Number(b.dataset.unit);
    current=0;
