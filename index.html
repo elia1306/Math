@@ -187,8 +187,9 @@ function menu(){
  }
  const stages=["觀念入門","例題解析","基礎練習","生活應用","單元總複習"];
  const open=selectedUnit===1||selectedUnit===2||selectedUnit===3;
- nav.innerHTML="<p class='callout'>📘 "+semesterUnits[selectedUnit]+"｜關卡地圖</p>"+stages.map((s,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-stage='"+i+"'>🔒 第 "+(i+1)+" 關｜"+s+"<small>"+(open?"教學與題庫已開放":"教學與題庫尚待建立")+"</small></button>").join("");
- nav.querySelectorAll("button[data-stage]").forEach(b=>b.onclick=()=>{current=Number(b.dataset.stage);showUnitStage(current)});
+ const progress=selectedUnit===1?unitTwoProgress:selectedUnit===2?unitThreeProgress:unitFourProgress;
+ nav.innerHTML="<p class='callout'>📘 "+semesterUnits[selectedUnit]+"｜關卡地圖</p>"+stages.map((s,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-stage='"+i+"' "+(i>0&&!progress.done.includes(i-1)?"disabled":"")+">"+(progress.done.includes(i)?"🏆 ":"🗝️ ")+"第 "+(i+1)+" 關｜"+s+"<small>"+(open?"教學與題庫已開放":"教學與題庫尚待建立")+"</small></button>").join("");
+ nav.querySelectorAll("button[data-stage]").forEach(b=>b.onclick=()=>{if(!b.disabled){current=Number(b.dataset.stage);showUnitStage(current)}});
 }
 const unitTwoLessons=[
  {title:"觀念入門",story:"偵探收到一張配方卡：做一份點心需要 1/2 杯牛奶。手上有 3/2 杯牛奶，可以做幾份？這就是分數除法要解決的問題。",body:"<h2>🥛 分數除法在問什麼？</h2><p>分數除法可以用來解決「有多少個這樣的量」或「平均分成幾份」的問題。</p><div class='example'><b>例：3/4 ÷ 1/4</b><br>想成 3/4 裡面有幾個 1/4？答案是 3。<br><b>3/4 ÷ 1/4 ＝ 3</b></div><div class='callout'>先想一想：除以 1/4，等於問裡面有幾個 1/4。</div>"},
@@ -243,7 +244,7 @@ function gradeUnitTwo(){
  let score=0;
  activeQuestions.forEach((q,i)=>{const key=current+"-"+q[0];const f=document.getElementById("f"+i);if(+picks[i].value===q[2]){score++;unitTwoProgress.correct++;delete unitTwoProgress.wrong[key];f.innerHTML="<div class='feedback good'>答對了！"+q[3]+"</div>"}else{unitTwoProgress.wrong[key]={question:q[0],correct:q[1][q[2]],why:q[3]};f.innerHTML="<div class='feedback bad'>正確答案："+q[1][q[2]]+"。"+q[3]+"</div>"}});
  if(!unitTwoProgress.done.includes(current))unitTwoProgress.done.push(current);
- saveUnitTwo();menu();
+ saveUnitTwo();menu();stats();
  document.getElementById("result").innerHTML="<p class='score'>本次答對 "+score+" / 5 題</p><p class='callout'>"+(score===5?"太棒了，全部答對！":"仔細看每題解析，弄懂倒數與約分的步驟。")+" 本關完成紀錄已保存。</p>";
 }
 
@@ -321,7 +322,7 @@ function makeUnitThreeQuestions(stage){const pool=unitThreeBank[stage].map(q=>ma
 let unitThreeProgress=JSON.parse(localStorage.getItem("mathQuestUnit3")||'{"done":[],"wrong":{},"correct":0}');
 function saveUnitThree(){localStorage.setItem("mathQuestUnit3",JSON.stringify(unitThreeProgress))}
 function renderUnitThree(stage){current=stage;menu();const lesson=unitThreeLessons[stage];activeQuestions=makeUnitThreeQuestions(stage);content.innerHTML="<span class='pill'>📚 六上第 3 單元｜小數除法</span><div class='case-stamp'>UNIT 03 · STAGE 0"+(stage+1)+"</div><div class='case-story'><p>"+lesson.story+"</p></div>"+lesson.body+"<h3>🔎 本關隨堂測驗</h3><p>每關 10 題隨機抽 5 題，提交後顯示答案與解析。</p><div id='quiz'></div><div class='actions'><button class='primary' id='finish'>提交答案</button><button class='secondary' id='next'>下一關 →</button></div><div id='result'></div>";document.getElementById("quiz").innerHTML=activeQuestions.map((q,i)=>"<div class='question'><b>"+(i+1)+". "+q[0]+"</b><span class='pill'>練習題</span>"+q[1].map((o,j)=>"<label class='option'><input type='radio' name='q"+i+"' value='"+j+"'> "+String.fromCharCode(65+j)+". "+o+"</label>").join("")+"<div id='f"+i+"'></div></div>").join("");document.getElementById("finish").onclick=gradeUnitThree;document.getElementById("next").onclick=()=>{if(!unitThreeProgress.done.includes(stage)){document.getElementById("result").innerHTML="<p class='feedback bad'>請先完成本關 5 題，再前往下一關。</p>";return}if(stage<4)renderUnitThree(stage+1);else document.getElementById("result").innerHTML="<p class='good feedback'>第三單元五關完成！可以重新挑戰。</p>"}}
-function gradeUnitThree(){const picks=activeQuestions.map((q,i)=>document.querySelector("input[name=q"+i+"]:checked"));if(picks.some(p=>!p)){document.getElementById("result").innerHTML="<p class='feedback bad'>請回答全部 5 題再提交。</p>";return}let score=0;activeQuestions.forEach((q,i)=>{const key=current+"-"+q[0],f=document.getElementById("f"+i);if(+picks[i].value===q[2]){score++;unitThreeProgress.correct++;delete unitThreeProgress.wrong[key];f.innerHTML="<div class='feedback good'>答對了！"+q[3]+"</div>"}else{unitThreeProgress.wrong[key]={question:q[0],correct:q[1][q[2]],why:q[3]};f.innerHTML="<div class='feedback bad'>正確答案："+q[1][q[2]]+"。"+q[3]+"</div>"}});if(!unitThreeProgress.done.includes(current))unitThreeProgress.done.push(current);saveUnitThree();menu();document.getElementById("result").innerHTML="<p class='score'>本次答對 "+score+" / 5 題</p><p class='callout'>"+(score===5?"太棒了，全部答對！":"仔細看每題解析，弄懂小數點移動步驟。")+" 本關完成紀錄已保存。</p>"}
+function gradeUnitThree(){const picks=activeQuestions.map((q,i)=>document.querySelector("input[name=q"+i+"]:checked"));if(picks.some(p=>!p)){document.getElementById("result").innerHTML="<p class='feedback bad'>請回答全部 5 題再提交。</p>";return}let score=0;activeQuestions.forEach((q,i)=>{const key=current+"-"+q[0],f=document.getElementById("f"+i);if(+picks[i].value===q[2]){score++;unitThreeProgress.correct++;delete unitThreeProgress.wrong[key];f.innerHTML="<div class='feedback good'>答對了！"+q[3]+"</div>"}else{unitThreeProgress.wrong[key]={question:q[0],correct:q[1][q[2]],why:q[3]};f.innerHTML="<div class='feedback bad'>正確答案："+q[1][q[2]]+"。"+q[3]+"</div>"}});if(!unitThreeProgress.done.includes(current))unitThreeProgress.done.push(current);saveUnitThree();menu();stats();document.getElementById("result").innerHTML="<p class='score'>本次答對 "+score+" / 5 題</p><p class='callout'>"+(score===5?"太棒了，全部答對！":"仔細看每題解析，弄懂小數點移動步驟。")+" 本關完成紀錄已保存。</p>"}
 
 
 const unitFourLessons=[
