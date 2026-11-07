@@ -87,9 +87,18 @@ button:active{transform:translate(2px,2px);box-shadow:none}
  .layout{grid-template-columns:minmax(0,1fr)}
  .suspect-card{grid-template-columns:68px minmax(0,1fr)}
 }
+
+/* Grade 6 semester unit selector */
+.unit-hint{font-size:13px;color:#526273;margin:4px 0 9px}
+.unit-picker{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0 16px}
+.unit-choice{font:inherit;text-align:left;cursor:pointer;padding:9px 8px;background:#fff;border:2px solid #17243a;border-radius:5px;box-shadow:2px 2px 0 #c6d1dc;color:#17243a;font-size:13px;line-height:1.45}
+.unit-choice.active{background:#ffdf59;box-shadow:3px 3px 0 #e94e62}
+.unit-choice small{display:block;font-size:11px;color:#526273}
+.unit-choice:focus-visible{outline:3px solid #e94e62;outline-offset:2px}
+@media(max-width:720px){.unit-picker{grid-template-columns:1fr 1fr}}
 </style></head><body>
 <header><div class="wrap"><div class="top"><strong>🕵️‍♂️🔎 數學偵探事務所</strong><span class="tag">國小六年級・數學冒險</span></div><h1>🔎 校慶失竊案：數字的真相</h1><p>🗝️ 一起追查失蹤的智慧之星獎盃！用數學破解謎團！</p><div class="progress"><div class="top"><b>🏁 闖關進度</b><span id="progressText">0 / 5 關</span></div><div class="bar"><span id="progressBar"></span></div></div></div></header>
-<main class="wrap layout"><aside class="panel"><h3>🗂️ 案件檔案</h3><div class="stats"><div class="stat"><b id="starCount">0 ⭐</b>星星</div><div class="stat"><b id="badgeCount">0 🏅</b>徽章</div></div><div id="badges" class="callout">🔍 破解案件，收集偵探徽章！</div><h3>🧍 嫌疑人名單</h3><div id="suspects"></div><h3>🧾 已收集證物</h3><div id="evidenceList" class="callout">尚未取得證物</div><nav id="nav"></nav><hr><h3>📁 偵查紀錄</h3><div class="stats"><div class="stat"><b id="correctCount">0</b>答對題數</div><div class="stat"><b id="wrongCount">0</b>待訂正</div></div><div class="actions"><button class="secondary" id="reviewWrong">查看錯題</button><button class="secondary" id="reset">重設紀錄</button></div></aside><section class="content" id="content" aria-live="polite"></section></main><p class="footer">學習紀錄保存在目前裝置的瀏覽器中；清除瀏覽資料可能會讓紀錄消失。</p>
+<main class="wrap layout"><aside class="panel"><h3>🗂️ 案件檔案</h3><div class="stats"><div class="stat"><b id="starCount">0 ⭐</b>星星</div><div class="stat"><b id="badgeCount">0 🏅</b>徽章</div></div><div id="badges" class="callout">🔍 破解案件，收集偵探徽章！</div><h3>🧍 嫌疑人名單</h3><div id="suspects"></div><h3>🧾 已收集證物</h3><div id="evidenceList" class="callout">尚未取得證物</div><h3>📚 六上單元選擇</h3><p class="unit-hint">先選擇目前已經學過的單元，再開始複習。</p><div id="unitPicker" class="unit-picker"></div><nav id="nav"></nav><hr><h3>📁 偵查紀錄</h3><div class="stats"><div class="stat"><b id="correctCount">0</b>答對題數</div><div class="stat"><b id="wrongCount">0</b>待訂正</div></div><div class="actions"><button class="secondary" id="reviewWrong">查看錯題</button><button class="secondary" id="reset">重設紀錄</button></div></aside><section class="content" id="content" aria-live="polite"></section></main><p class="footer">學習紀錄保存在目前裝置的瀏覽器中；清除瀏覽資料可能會讓紀錄消失。</p>
 <script>
 const lessons=[
 {title:"第 1 關｜觀念村",story:"數學偵探你好！校慶前夕，展示櫃裡的「智慧之星獎盃」竟然不見了！現場只留下三張數字卡：24、18、12。先破解因數密碼，找出第一條線索！",sub:"因數、倍數、公因數、公倍數",body:"<h2>🌱 認識因數與倍數</h2><p><b>因數</b>：可以整除某個數的數。<br><b>倍數</b>：某個數乘以整數得到的數。</p><div class='example'><b>12 的因數：</b>1、2、3、4、6、12<br><b>18 的因數：</b>1、2、3、6、9、18<br><b>公因數：</b>1、2、3、6 → 最大公因數是 6<br><br><b>12 的倍數：</b>12、24、36……<br><b>18 的倍數：</b>18、36、54……<br><b>公倍數：</b>36、72…… → 最小公倍數是 36</div><div class='callout'>🪄 小口訣：因數是「除得盡」；倍數是「乘出來」。</div>",qs:[["24 的所有因數有哪些？",["1、2、3、4、6、8、12、24","1、2、4、6、12","2、3、4、6、8"],0,"24 可以被 1、2、3、4、6、8、12、24 整除。"],["8 的前 5 個正倍數是哪一組？",["8、16、24、32、40","8、16、24、32、40、48","1、2、4、8、16"],0,"8×1 到 8×5，依序是 8、16、24、32、40。"],["12 和 20 的公因數有哪些？",["1、2、4","1、2、3、4","2、4、6"],0,"12 和 20 都能被 1、2、4 整除。"]]},
@@ -184,6 +193,26 @@ function summary(){
  content.innerHTML="<span class='case-stamp'>FINAL DEDUCTION</span><h2>🎬 真相揭曉！獎盃失竊案結案</h2><div class='case-story'><p>真正移動獎盃的人是阿花小天使，校刊編輯！但他不是要偷走獎盃，而是想把獎盃放到活動中心的驚喜展台，準備在校慶當天揭幕。</p></div><h3>🧾 五件證物如何串起真相？</h3>"+state.evidence.map((e,i)=>"<div class='question'><b>"+e+"</b><p>"+["星星貼紙與校刊封面相同，線索指向校刊編輯。","金色緞帶來自校刊編輯桌上的佈置材料。","時間紀錄與阿花小天使前往活動中心前的準備時段吻合。","目擊者看到海報筒，與阿花小天使製作驚喜展台的工作相符。","字條說明他把獎盃移去展台，真相終於完整。"][i]+"</p></div>").join("")+"<h3>🕵️ 偵探的結案報告</h3><p class='callout'>傅貝貝與傅シロ都只是協助校慶準備。阿花小天使想製造驚喜，卻忘了先告訴老師，才讓大家誤以為獎盃失竊。這是一場烏龍事件！</p><p class='score'>⭐ "+state.stars+" 顆星星｜🏅 "+state.badges.length+" 枚徽章</p><button class='primary' id='back'>回到案件地圖</button>";
  document.getElementById("back").onclick=()=>{current=0;render()};
 }
+
+const semesterUnits=[
+ "最大公因數與最小公倍數","分數除法","小數除法","比與比值",
+ "兩量關係","圓周長與扇形周長","放大、縮小與比例尺","怎樣解題"
+];
+let selectedUnit=0;
+function drawUnitPicker(){
+ const box=document.getElementById("unitPicker");
+ if(!box)return;
+ box.innerHTML=semesterUnits.map((name,i)=>"<button type='button' class='unit-choice "+(i===selectedUnit?"active":"")+"' data-unit='"+i+"' aria-pressed='"+(i===selectedUnit)+"'>"+(i+1)+". "+name+"<small>"+(i===0?"目前已有完整偵探關卡":"單元已列入複習地圖")+"</small></button>").join("");
+ box.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+   const n=Number(b.dataset.unit);
+   if(n!==0){
+     document.getElementById("content").innerHTML="<h2>📚 第 "+(n+1)+" 單元｜"+semesterUnits[n]+"</h2><div class='callout'>已切換到這個單元！目前網站的完整隨機題庫與教學內容仍先以第 1 單元為主；其他單元已加入複習地圖，接下來會逐單元補上教學內容、隨機題庫與答題紀錄。</div><p>你可以先在這裡選擇想複習的單元；尚未學過的單元也可以先不練習，不會影響第 1 單元的進度。</p><button class='primary' id='backUnitOne'>返回第 1 單元</button>";
+     selectedUnit=n;drawUnitPicker();
+     document.getElementById("backUnitOne").onclick=()=>{selectedUnit=0;drawUnitPicker();current=0;render()};
+   }else{selectedUnit=0;drawUnitPicker();current=0;render()}
+ }));
+}
+
 document.getElementById("reviewWrong").onclick=()=>{let a=Object.values(state.wrong);content.innerHTML="<h2>📒 我的錯題本</h2>"+(a.length?a.map((x,i)=>"<div class='question'><b>"+(i+1)+". "+x.question+"</b><p class='good'>正確答案："+x.correct+"</p><p>"+x.why+"</p></div>").join(""):"<p class='callout'>目前沒有待訂正錯題，真棒！</p>")+"<button class='secondary' id='return'>返回課程</button>";document.getElementById("return").onclick=render};
-document.getElementById("reset").onclick=()=>{if(confirm("確定清除所有星星、徽章與紀錄？")){state={done:[],correct:0,wrong:{},stars:0,badges:[],rewarded:[],evidence:[],caseSolved:false};save();current=0;render()}};stats();render();
+document.getElementById("reset").onclick=()=>{if(confirm("確定清除所有星星、徽章與紀錄？")){state={done:[],correct:0,wrong:{},stars:0,badges:[],rewarded:[],evidence:[],caseSolved:false};save();current=0;render()}};stats();drawUnitPicker();render();
 </script></body></html>
