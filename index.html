@@ -214,7 +214,7 @@ function buildUnitTwoBank(){
   let prompt,why;
   if(s===0){prompt=fraction(a,b)+" ÷ "+fraction(c,d)+" 的意思是什麼？請計算。";why="除以 "+fraction(c,d)+"，就是看 "+fraction(a,b)+" 裡有幾個 "+fraction(c,d)+"；計算結果為 "+fraction(ans[0],ans[1])+"。"}
   else if(s===1){prompt=(i===8?"2 ÷ "+fraction(c,d)+" ＝？":fraction(a,b)+" ÷ "+fraction(c,d)+" ＝？");if(i===8){const n=2*d,den=c,g2=gcd(n,den);prompt="2 ÷ "+fraction(c,d)+" ＝？";why="整數 2 乘以除數的倒數 "+fraction(d,c)+"，得到 "+fraction(n,den)+"＝"+fraction(n/g2,den/g2)+"。";}else{why="除以 "+fraction(c,d)+"，改成乘以倒數 "+fraction(d,c)+"；"+fraction(a,b)+" × "+fraction(d,c)+"＝"+fraction(ans[0],ans[1])+"。"}}
-  else if(s===2){if(i===8){prompt=fraction(a,b)+" ÷ 2 ＝？";const den2=b*2,g2=gcd(a,den2);why="除以整數 2，等於乘以 1/2："+fraction(a,b)+" × 1/2＝"+fraction(a,den2)+"＝"+fraction(a/g2,den2/g2)+"。";}else{prompt="計算並約成最簡分數："+fraction(a,b)+" ÷ "+fraction(c,d)+"。";why="先乘除數的倒數，再約分："+fraction(a,b)+" × "+fraction(d,c)+"＝"+fraction(ans[0],ans[1])+"。"}}
+  else if(s===2){if(i===8){prompt=fraction(a,b)+" ÷ 2 ＝？";const den2=b*2,g2=gcd(a,den2);why="除以整數 2，等於乘以 1/2："+fraction(a,b)+" × 1/2＝"+fraction(a/g2,den2/g2)+"。";}else{prompt="計算並約成最簡分數："+fraction(a,b)+" ÷ "+fraction(c,d)+"。";why="先乘除數的倒數，再約分："+fraction(a,b)+" × "+fraction(d,c)+"＝"+fraction(ans[0],ans[1])+"。"}}
   else if(s===3){prompt="有 "+fraction(a,b)+" 公尺的緞帶，每份用 "+fraction(c,d)+" 公尺，可以做幾份？";why="總長 ÷ 每份長度＝份數："+fraction(a,b)+" ÷ "+fraction(c,d)+"＝"+fraction(ans[0],ans[1])+" 份。"}
   else{prompt="單元總複習： "+fraction(a,b)+" ÷ "+fraction(c,d)+" 的結果是多少？";why="除以分數要乘以它的倒數："+fraction(a,b)+" × "+fraction(d,c)+"＝"+fraction(ans[0],ans[1])+"。"}
   add(s,prompt,ans,why,wrong,i<5?"基礎":s===3?"應用":"進階");
