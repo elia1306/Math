@@ -178,7 +178,7 @@ if(!Array.isArray(state.evidence)){state={done:[],correct:0,wrong:{},stars:0,bad
 state.stars=state.stars||0;state.badges=state.badges||[];state.rewarded=state.rewarded||[];state.evidence=state.evidence||[];state.caseSolved=state.caseSolved||false;let current=0;
 const nav=document.getElementById("nav"),content=document.getElementById("content");
 function save(){localStorage.setItem("mathQuest",JSON.stringify(state));stats()}
-function stats(){document.getElementById("suspects").innerHTML=suspectBoard();document.getElementById("evidenceList").innerHTML=state.evidence.length?state.evidence.map(e=>"<p>🔎 "+e+"</p>").join(""):"尚未取得證物";document.getElementById("progressText").textContent=state.done.length+" / 5 關";document.getElementById("progressBar").style.width=state.done.length*20+"%";document.getElementById("correctCount").textContent=state.correct;document.getElementById("wrongCount").textContent=Object.keys(state.wrong).length+(typeof unitTwoProgress!=="undefined"?Object.keys(unitTwoProgress.wrong).length:0);document.getElementById("starCount").textContent=state.stars+" ⭐";document.getElementById("badgeCount").textContent=state.badges.length+" 🏅";document.getElementById("badges").innerHTML=state.badges.length?"🏅 我的徽章： "+state.badges.map(x=>"<span class='badge'>"+x+"</span>").join(""):"🎁 完成關卡收集徽章！"}
+function stats(){document.getElementById("suspects").innerHTML=suspectBoard();document.getElementById("evidenceList").innerHTML=state.evidence.length?state.evidence.map(e=>"<p>🔎 "+e+"</p>").join(""):"尚未取得證物";const completed=selectedUnit===1&&typeof unitTwoProgress!=="undefined"?unitTwoProgress.done.length:state.done.length;document.getElementById("progressText").textContent=completed+" / 5 關";document.getElementById("progressBar").style.width=completed*20+"%";document.getElementById("correctCount").textContent=state.correct+(typeof unitTwoProgress!=="undefined"?unitTwoProgress.correct:0);document.getElementById("wrongCount").textContent=Object.keys(state.wrong).length+(typeof unitTwoProgress!=="undefined"?Object.keys(unitTwoProgress.wrong).length:0);document.getElementById("starCount").textContent=state.stars+" ⭐";document.getElementById("badgeCount").textContent=state.badges.length+" 🏅";document.getElementById("badges").innerHTML=state.badges.length?"🏅 我的徽章： "+state.badges.map(x=>"<span class='badge'>"+x+"</span>").join(""):"🎁 完成關卡收集徽章！"}
 function menu(){
  if(selectedUnit===0){
   nav.innerHTML=lessons.map((l,i)=>"<button class='navbtn "+(i===current?"active":"")+"' data-i='"+i+"' "+(i>0&&!state.done.includes(i-1)?"disabled":"")+">"+(state.done.includes(i)?"🏆 ":"🗝️ ")+l.title+"<small>"+l.sub+"</small></button>").join("");
@@ -204,7 +204,7 @@ function buildUnitTwoBank(){
   [[3,4,1,4],[2,3,1,3],[5,6,1,6],[7,8,1,8],[4,5,2,5],[3,5,1,5],[5,8,1,8],[7,10,1,10],[2,5,2,5],[3,7,1,7]],
   [[2,3,4,5],[3,4,2,5],[5,6,3,4],[4,7,2,3],[3,8,4,5],[5,9,2,3],[7,10,5,6],[2,7,3,4],[5,12,4,9],[7,9,2,3]],
   [[3,5,2,7],[4,9,2,3],[5,8,3,4],[7,12,2,5],[3,10,4,7],[5,6,5,8],[7,15,7,10],[4,11,2,7],[5,14,5,7],[8,15,4,9]],
-  [[3,4,1,8],[5,6,1,6],[7,8,1,4],[2,3,1,9],[4,5,2,5],[5,8,1,4],[3,7,1,7],[7,10,1,5],[5,6,1,3],[9,10,3,10]],
+  [[3,4,1,8],[5,6,1,6],[7,8,1,8],[2,3,1,9],[4,5,2,5],[5,8,1,8],[3,7,1,7],[7,10,1,10],[5,6,1,6],[9,10,3,10]],
   [[2,3,3,4],[5,8,2,3],[7,9,1,3],[3,5,4,7],[5,12,5,6],[7,10,7,15],[4,9,2,3],[3,8,3,4],[5,7,10,21],[7,12,7,18]]
  ];
  sets.forEach((arr,s)=>arr.forEach(([a,b,c,d],i)=>{
@@ -295,5 +295,5 @@ function drawUnitPicker(){
 }
 
 document.getElementById("reviewWrong").onclick=()=>{let a=Object.values(state.wrong).concat(typeof unitTwoProgress!=="undefined"?Object.values(unitTwoProgress.wrong):[]);content.innerHTML="<h2>📒 我的錯題本</h2>"+(a.length?a.map((x,i)=>"<div class='question'><b>"+(i+1)+". "+x.question+"</b><p class='good'>正確答案："+x.correct+"</p><p>"+x.why+"</p></div>").join(""):"<p class='callout'>目前沒有待訂正錯題，真棒！</p>")+"<button class='secondary' id='return'>返回課程</button>";document.getElementById("return").onclick=()=>{if(selectedUnit===1)showUnitStage(current);else if(selectedUnit===0)render();else showUnitStage(current)}};
-document.getElementById("reset").onclick=()=>{if(confirm("確定清除所有星星、徽章與紀錄？")){state={done:[],correct:0,wrong:{},stars:0,badges:[],rewarded:[],evidence:[],caseSolved:false};save();current=0;render()}};stats();drawUnitPicker();render();
+document.getElementById("reset").onclick=()=>{if(confirm("確定清除所有星星、徽章與紀錄？")){state={done:[],correct:0,wrong:{},stars:0,badges:[],rewarded:[],evidence:[],caseSolved:false};unitTwoProgress={done:[],wrong:{},correct:0};saveUnitTwo();save();current=0;if(selectedUnit===0)render();else showUnitStage(0)}};stats();drawUnitPicker();render();
 </script></body></html>
