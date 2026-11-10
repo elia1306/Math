@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fff0a8">
+<title>六年級數學期中考模擬測驗</title>
+<style>
+:root{--ink:#17243a;--red:#e94e62;--blue:#2868a8;--gold:#ffdf59;--paper:#fffef9;--line:#17243a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(#26374a18 1px,transparent 1px),linear-gradient(135deg,#fff8e9,#eaf3ff);background-size:9px 9px,auto;color:var(--ink);font-family:"Noto Sans TC",system-ui,sans-serif;line-height:1.7}
+header{background:linear-gradient(125deg,#14365a,#23669a 65%,#e64e62);color:white;padding:22px 16px;border-bottom:7px solid var(--gold)}
+.wrap{max-width:1050px;margin:auto;padding:0 16px}.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+h1{font-size:clamp(25px,5vw,38px);margin:10px 0}header p{margin:4px 0}.tag{display:inline-block;background:var(--gold);color:var(--ink);padding:4px 10px;border:2px solid var(--ink);font-weight:900;border-radius:4px}
+main{padding:20px 0 40px}.paper{background:var(--paper);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:20px;border-radius:5px;margin-bottom:18px}
+h2{margin:0 0 12px}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:14px 0}
+.stat{background:#eaf4ff;border:2px solid var(--ink);padding:9px;text-align:center}.stat b{display:block;font-size:21px}
+input,button{font:inherit}input[type=text],input[type=number],input.answer{width:100%;padding:10px;border:2px solid #9aabb8;border-radius:5px;background:white;color:var(--ink)}
+button{cursor:pointer}.primary{background:var(--red);color:white;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:10px 17px;font-weight:900;border-radius:4px}.secondary{background:#eaf4ff;border:2px solid var(--ink);box-shadow:3px 3px 0 #b7c5d0;padding:8px 13px;border-radius:4px;color:var(--ink)}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}.hint{background:#fff0a8;border-left:7px solid var(--red);padding:12px;margin:12px 0}.muted{color:#596b78;font-size:13px}
+#exam{display:none}.qgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:12px 0}.qjump{padding:7px 0;background:white;border:1px solid #9aabb8;border-radius:4px}.qjump.done{background:#dff2df;border:2px solid #36734b;font-weight:bold}.qjump.current{outline:3px solid var(--red)}
+.question{border:2px solid var(--ink);background:white;padding:15px;margin:14px 0;scroll-margin-top:10px}.qhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.unit{font-size:12px;background:#eaf4ff;border:1px solid #9aabb8;padding:2px 7px}.points{font-size:12px;color:#596b78}.stem{font-size:17px;font-weight:750;margin:9px 0 12px}
+.option{display:flex;gap:8px;align-items:flex-start;border:1px solid #c5d0d8;padding:8px;margin:7px 0;border-radius:4px;cursor:pointer}.option:has(input:checked){background:#fff0a8;border:2px solid var(--ink)}.option input{margin-top:6px}
+.question.correct{border-color:#36734b;background:#f2fbf1}.question.wrong{border-color:#bd3f4c;background:#fff5f4}
+.feedback{margin-top:10px;padding:10px;background:#edf3f5;border-left:5px solid var(--blue)}.good{border-left-color:#36734b;background:#e8f5e8}.bad{border-left-color:#bd3f4c;background:#fff0f0}
+.resultScore{font-size:32px;font-weight:900;color:#a06d1c}.unitTable{width:100%;border-collapse:collapse;margin:12px 0}.unitTable td,.unitTable th{border:1px solid #bac6cc;padding:8px;text-align:left}
+footer{text-align:center;color:#596b78;font-size:12px;padding:10px 0 25px}
+@media(max-width:650px){.meta{grid-template-columns:repeat(2,1fr)}.paper{padding:14px}.qgrid{grid-template-columns:repeat(6,1fr)}}
+@media print{header,.no-print,#intro{display:none!important}body{background:white}.paper{box-shadow:none;border:1px solid #777;break-inside:avoid}.question{break-inside:avoid}.wrap{max-width:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="top"><strong>🕵️ 數學偵探事務所｜正式考場</strong><span class="tag">模擬考 v1.0</span></div><h1>📋 六年級上學期數學期中考</h1><p>翰林版第 1～4 單元｜限時 50 分鐘｜滿分 100 分</p></div></header>
+<main class="wrap">
+<section class="paper" id="intro">
+<h2>📝 考試說明</h2>
+<div class="meta"><div class="stat"><b>30</b>題</div><div class="stat"><b>100</b>分</div><div class="stat"><b>50</b>分鐘</div><div class="stat"><b>4</b>個單元</div></div>
+<p><b>考試範圍</b></p>
+<ul><li>第一單元：最大公因數與最小公倍數</li><li>第二單元：分數除法</li><li>第三單元：小數除法</li><li>第四單元：比與比值</li></ul>
+<div class="hint">請準備紙筆計算。選擇題請點選一個答案；填充與計算題請輸入數字、最簡分數或帶分數。每題都要作答才能交卷。交卷前可以自由檢查及修改答案。</div>
+<label>考生姓名（選填）<input id="student" type="text" placeholder="輸入姓名"></label>
+<div class="actions"><button class="primary" id="start">開始考試</button><a href="index.html" class="secondary" style="text-decoration:none">返回數學首頁</a></div>
+<p class="muted">本測驗在目前瀏覽器中作答；重新整理頁面不會保留本次未交卷答案。</p>
+</section>
+<section id="exam">
+<div class="paper no-print">
+<div class="top"><b id="candidate">考生：尚未填寫</b><b>剩餘時間：<span id="timer">50:00</span></b></div>
+<div class="meta"><div class="stat"><b id="answered">0 / 30</b>已作答</div><div class="stat"><b>100</b>總分</div><div class="stat"><b>30</b>總題數</div><div class="stat"><b id="remain">30</b>未作答</div></div>
+<div class="qgrid" id="jump"></div><p class="muted">綠色代表已作答。點選題號可跳到該題。</p>
+</div>
+<div id="questions" class="paper"></div>
+<div class="paper no-print"><div class="actions"><button class="secondary" id="topBtn">回到題目上方</button><button class="primary" id="submit">確認交卷</button></div><p class="muted">交卷後會立即批改並顯示總分、各單元成績及每題解析。</p></div>
+</section>
+<section id="result" class="paper" style="display:none"></section>
+</main>
+<footer>數學偵探事務所｜六年級期中考模擬測驗｜題目為練習用途</footer>
+<script>
+const bank=[
+{u:1,t:"選擇",s:"48 和 60 的最大公因數是多少？",o:["6","12","15","18"],a:"12",e:"48＝2×2×2×2×3，60＝2×2×3×5，共同質因數相乘為 2×2×3＝12。"},
+{u:1,t:"選擇",s:"18 和 24 的最小公倍數是多少？",o:["48","60","72","96"],a:"72",e:"18＝2×3×3，24＝2×2×2×3，取各質因數最高次方：2×2×2×3×3＝72。"},
+{u:1,t:"選擇",s:"90 的質因數分解是哪一個？",o:["2×3×3×5","2×3×5","2×2×3×5","3×3×10"],a:"2×3×3×5",e:"90＝2×45＝2×3×3×5，所有因數都是質數。"},
+{u:1,t:"填充",s:"有 36 枝鉛筆和 48 塊橡皮擦，要平均分裝成內容相同且沒有剩下的最多份，最多可以分成幾份？",a:"12",e:"最多份數是 36 和 48 的最大公因數：12。"},
+{u:1,t:"選擇",s:"甲燈每 12 分鐘閃一次，乙燈每 18 分鐘閃一次。兩燈同時閃後，至少幾分鐘會再次同時閃？",o:["24 分鐘","30 分鐘","36 分鐘","72 分鐘"],a:"36 分鐘",e:"週期再次重合要找最小公倍數，12 和 18 的最小公倍數是 36。"},
+{u:1,t:"選擇",s:"24 和 36 的公因數中，最大的是哪一個？",o:["4","6","12","18"],a:"12",e:"24 和 36 的公因數有 1、2、3、4、6、12，最大的是 12。"},
+{u:1,t:"填充",s:"公車甲每 15 分鐘一班，公車乙每 20 分鐘一班。兩車同時發車後，至少幾分鐘會再次同時發車？",a:"60",e:"15 和 20 的最小公倍數是 60，所以 60 分鐘後再次同時發車。"},
+{u:2,t:"選擇",s:"計算：3/5 ÷ 2/3＝？",o:["2/5","9/10","5/6","6/15"],a:"9/10",e:"除以分數要乘以倒數：3/5×3/2＝9/10。"},
+{u:2,t:"填充",s:"計算：2 又 1/4 ÷ 3/8＝？請用最簡整數或帶分數表示。",a:"6",e:"2又1/4＝9/4，9/4×8/3＝72/12＝6。"},
+{u:2,t:"選擇",s:"計算：5/6 ÷ 10/9＝？",o:["3/4","4/3","5/9","25/27"],a:"3/4",e:"5/6×9/10＝45/60＝3/4。"},
+{u:2,t:"填充",s:"一條長 4/5 公尺的緞帶，每段剪成 2/15 公尺，最多可以剪成幾段？",a:"6",e:"4/5÷2/15＝4/5×15/2＝6 段。"},
+{u:2,t:"選擇",s:"計算：1 又 2/3 ÷ 5/6＝？",o:["1","2","2 又 1/2","3"],a:"2",e:"1又2/3＝5/3，5/3×6/5＝2。"},
+{u:2,t:"填充",s:"計算：7/8 ÷ 1/4＝？請用最簡分數或帶分數表示。",a:"3又1/2",e:"7/8×4＝28/8＝7/2＝3又1/2。"},
+{u:2,t:"選擇",s:"計算：2/3 ÷ 4/9＝？",o:["1 又 1/2","1 又 1/3","2/3","3/8"],a:"1又1/2",e:"2/3×9/4＝18/12＝3/2＝1又1/2。"},
+{u:2,t:"填充",s:"有 3/4 公升的果汁，每杯裝 1/8 公升，可以裝滿幾杯？",a:"6",e:"3/4÷1/8＝3/4×8＝6 杯。"},
+{u:3,t:"選擇",s:"計算：8.64 ÷ 1.2＝？",o:["0.72","7.2","72","720"],a:"7.2",e:"被除數和除數同乘 10：86.4÷12＝7.2。"},
+{u:3,t:"填充",s:"計算：15.75 ÷ 0.5＝？",a:"31.5",e:"15.75÷0.5＝157.5÷5＝31.5。"},
+{u:3,t:"選擇",s:"計算：6.3 ÷ 0.09＝？",o:["0.7","7","70","700"],a:"70",e:"兩數同乘 100：630÷9＝70。"},
+{u:3,t:"填充",s:"一條 4.8 公尺的繩子，每段剪成 0.35 公尺，最多可以剪成幾段完整的繩子？",a:"13",e:"4.8÷0.35＝480÷35＝13……餘數，最多剪出 13 段完整繩子。"},
+{u:3,t:"填充",s:"計算：12.6 ÷ 0.03＝？",a:"420",e:"兩數同乘 100：1260÷3＝420。"},
+{u:3,t:"選擇",s:"計算：0.756 ÷ 0.18＝？",o:["0.42","4.2","42","420"],a:"4.2",e:"兩數同乘 100：75.6÷18＝4.2。"},
+{u:3,t:"填充",s:"有 9.6 公斤的米，每袋裝 0.4 公斤，可以裝滿幾袋？",a:"24",e:"9.6÷0.4＝96÷4＝24 袋。"},
+{u:4,t:"選擇",s:"將 18：30 化成最簡整數比，結果是多少？",o:["3：5","5：3","6：10","9：15"],a:"3：5",e:"18 和 30 同除以最大公因數 6，得到 3：5。"},
+{u:4,t:"選擇",s:"男生有 12 人，女生有 16 人。男生人數比女生人數的最簡整數比是多少？",o:["3：4","4：3","12：4","2：3"],a:"3：4",e:"12：16 同除以 4，得到 3：4，順序是男生比女生。"},
+{u:4,t:"填充",s:"甲、乙兩數的比是 2：5，甲數是 18，乙數是多少？",a:"45",e:"2 份是 18，1 份是 9，乙數有 5 份：9×5＝45。"},
+{u:4,t:"選擇",s:"紅球和藍球的數量比是 3：4，兩種球合計 56 顆，紅球有幾顆？",o:["21 顆","24 顆","28 顆","32 顆"],a:"24 顆",e:"總份數 3＋4＝7，每份 56÷7＝8 顆，紅球 3×8＝24 顆。"},
+{u:4,t:"選擇",s:"比 3：8 的比值是多少？",o:["8/3","3/8","3/5","8/11"],a:"3/8",e:"比值是前項除以後項，因此 3÷8＝3/8。"},
+{u:4,t:"填充",s:"把 2：3 寫成前項是 10 的等值比，後項是多少？",a:"15",e:"2 擴大 5 倍成為 10，後項 3 也擴大 5 倍：3×5＝15。"},
+{u:4,t:"填充",s:"水和果 syrup 的比是 5：2，調製後總量是 28 公升，果 syrup 有幾公升？",a:"8",e:"總份數 5＋2＝7，每份 28÷7＝4 公升，果 syrup 有 2×4＝8 公升。"},
+{u:4,t:"選擇",s:"將 24：36：48 化成最簡整數比，結果是哪一個？",o:["2：3：4","3：4：5","4：6：8","1：2：3"],a:"2：3：4",e:"三個數同除以最大公因數 12，得到 2：3：4。"}
+];
+let qs=[],answers={},finished=false,remaining=3000,tick=null;
+const unitNames={1:"最大公因數與最小公倍數",2:"分數除法",3:"小數除法",4:"比與比值"};
+const $=id=>document.getElementById(id);
+function shuffle(a){const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
+function start(){qs=shuffle(bank.map((q,i)=>({...q,id:i+1})));answers={};finished=false;remaining=3000;$("intro").style.display="none";$("exam").style.display="block";$("result").style.display="none";$("candidate").textContent="考生："+($("student").value.trim()||"未填寫");draw();updateProgress();$("timer").textContent="50:00";clearInterval(tick);tick=setInterval(()=>{remaining--;const m=Math.floor(remaining/60),s=remaining%60;$("timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");if(remaining<=0){clearInterval(tick);submit(true)}},1000);window.scrollTo(0,0)}
+function draw(){const host=$("questions");host.innerHTML=qs.map((q,i)=>{const opts=q.o?'<div>'+q.o.map((o,j)=>'<label class="option"><input type="radio" name="q'+i+'" value="'+escapeHtml(o)+'"> <span>'+String.fromCharCode(65+j)+'. '+escapeHtml(o)+'</span></label>').join("")+'</div>':'<input class="answer" type="text" inputmode="decimal" placeholder="請輸入答案，例如：6、3/4、3又1/2" aria-label="第'+(i+1)+'題答案">';return '<article class="question" id="q'+i+'"><div class="qhead"><b>第 '+(i+1)+' 題｜'+q.t+'題</b><span class="unit">第 '+q.u+' 單元</span><span class="points">'+(i<20?3:4)+' 分</span></div><div class="stem">'+q.s+'</div>'+opts+'<div class="feedback" id="fb'+i+'" hidden></div></article>'}).join("");host.querySelectorAll("input").forEach(el=>el.addEventListener("change",()=>{const art=el.closest(".question"),idx=Number(art.id.slice(1));answers[idx]=el.type==="radio"?el.value:el.value.trim();updateProgress()}));$("jump").innerHTML=qs.map((q,i)=>'<button class="qjump" data-i="'+i+'">'+(i+1)+'</button>').join("");$("jump").querySelectorAll("button").forEach(b=>b.onclick=()=> $("q"+b.dataset.i).scrollIntoView({behavior:"smooth",block:"start"}))}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function updateProgress(){$("answered").textContent=Object.keys(answers).filter(k=>String(answers[k]).trim()!=="").length+" / 30";$("remain").textContent=30-Object.keys(answers).filter(k=>String(answers[k]).trim()!=="").length;$("jump").querySelectorAll("button").forEach((b,i)=>b.classList.toggle("done",String(answers[i]||"").trim()!==""))}
+function numeric(s){s=String(s??"").trim().replace(/\s/g,"").replace(/：/g,":").replace(/又/g,"+");if(!s)return NaN;const mixed=s.match(/^(-?\d+)\+(\d+)\/(\d+)$/);if(mixed)return Number(mixed[1])+Number(mixed[2])/Number(mixed[3]);const frac=s.match(/^(-?\d+)\/(\d+)$/);if(frac)return Number(frac[1])/Number(frac[2]);return Number(s.replace(/,/g,""))}
+function same(a,b){if(String(a).trim()===String(b).trim())return true;const x=numeric(a),y=numeric(b);return Number.isFinite(x)&&Number.isFinite(y)&&Math.abs(x-y)<1e-9}
+function submit(auto=false){if(finished)return;const missing=qs.map((q,i)=>i).filter(i=>String(answers[i]??"").trim()==="");if(missing.length&&!auto){alert("還有 "+missing.length+" 題未作答，請完成後再交卷。");$("q"+missing[0]).scrollIntoView({behavior:"smooth"});return}if(!auto&&!confirm("確定要交卷嗎？交卷後將無法修改答案。"))return;finished=true;clearInterval(tick);let score=0;const unit={1:{got:0,total:0},2:{got:0,total:0},3:{got:0,total:0},4:{got:0,total:0}};qs.forEach((q,i)=>{const pts=i<20?3:4;unit[q.u].total+=pts;const ok=same(answers[i],q.a);if(ok){score+=pts;unit[q.u].got+=pts}const art=$("q"+i),fb=$("fb"+i);art.classList.add(ok?"correct":"wrong");fb.hidden=false;fb.className="feedback "+(ok?"good":"bad");fb.innerHTML=(ok?"✓ 答對":"✗ 答錯")+"｜正確答案："+escapeHtml(q.a)+"<br>"+escapeHtml(q.e)+(String(answers[i]??"").trim()?"":"<br>本題未作答。")});$("exam").querySelectorAll("input,button").forEach(el=>el.disabled=true);$("submit").disabled=true;const pct=Math.round(score);$("result").style.display="block";$("result").innerHTML='<h2>📊 考試成績單</h2><p>'+(auto?"時間到，系統已自動交卷。":"已完成交卷。")+'</p><div class="resultScore">'+score+' / 100 分</div><p>答對 '+qs.filter((q,i)=>same(answers[i],q.a)).length+' 題，共 30 題。</p><h3>各單元成績</h3><table class="unitTable"><thead><tr><th>單元</th><th>得分</th><th>表現</th></tr></thead><tbody>'+[1,2,3,4].map(u=>'<tr><td>'+unitNames[u]+'</td><td>'+unit[u].got+' / '+unit[u].total+'</td><td>'+Math.round(unit[u].got/unit[u].total*100)+'%</td></tr>').join("")+'</tbody></table><h3>錯題整理</h3><p>紅色題目為答錯或未作答，請回到題目查看正確答案與解題說明。</p><div class="actions no-print"><button class="primary" onclick="window.print()">列印成績／錯題</button><button class="secondary" onclick="location.reload()">重新測驗</button><a class="secondary" href="index.html" style="text-decoration:none">返回數學首頁</a></div>';$("result").scrollIntoView({behavior:"smooth"})}
+$("start").onclick=start;$("submit").onclick=()=>submit(false);$("topBtn").onclick=()=>window.scrollTo({top:0,behavior:"smooth"});
+</script>
+</body></html>
